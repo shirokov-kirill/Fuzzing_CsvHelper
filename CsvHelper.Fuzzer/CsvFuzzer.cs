@@ -1,9 +1,10 @@
+using System.Text;
 using CsvHelper.Fuzzer.Generator;
 using CsvHelper.Fuzzer.Tests;
 
 namespace CsvHelper.Fuzzer;
 
-public class CsvRandomFuzzer<T>(IInputGenerator generator, Func<string, object, ExecutionResult<T>> target)
+public class CsvFuzzer<T>(IInputGenerator generator, Func<string, object, ExecutionResult<T>> target)
 {
 	public void Fuzz()
 	{
@@ -21,7 +22,15 @@ public class CsvRandomFuzzer<T>(IInputGenerator generator, Func<string, object, 
 					Console.WriteLine($"Failed, actual result: [");
 					foreach (var record in result.Payload)
 					{
-						Console.WriteLine($"{record?.ToString()}");
+						var dynamicRecord = record as IDictionary<string, object?>;
+						var sb = new StringBuilder();
+						sb.Append("{ ");
+						foreach (var key in dynamicRecord.Keys)
+						{
+							sb.Append($"{key}: {dynamicRecord[key]}, ");
+						}
+						sb.Append(" }");
+						Console.WriteLine($"{sb}");
 					}
 					Console.WriteLine($"]");
 				}

@@ -4,9 +4,9 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public class RandomGenerator(Random random): IInputGenerator
+public class RandomGenerator(Random random): InputGeneratorBase
 {
-	public (string, object) Generate()
+	public override (string, object) Generate()
 	{
 		var linesCount = random.Next(500);
 		var lines = new string[linesCount];
@@ -17,14 +17,7 @@ public class RandomGenerator(Random random): IInputGenerator
 			lines[i] = line;
 		}
 
-		// create storage folder if none exists
-		string storagePath =GeneratorUtils.GetPathToStorage();
-		bool exists = System.IO.Directory.Exists(storagePath);
-		if(!exists)
-			System.IO.Directory.CreateDirectory(storagePath);
-
-		var filePath = storagePath + @"\input.csv";
-		File.Create(filePath).Close();
+		var filePath = CreateEmptyFile();
 		using StreamWriter file = new StreamWriter(filePath);
 		foreach (var line in lines)
 		{

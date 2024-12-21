@@ -53,7 +53,7 @@ class TestRunner
 
 	static void Main(string[] args)
 	{
-		var randomFuzzer = new CsvRandomFuzzer<string>(new RandomGenerator(new Random()), Execute<string>);
+		var randomFuzzer = new CsvFuzzer<dynamic>(new SpecificationBasedGenerator(new Random()), Execute<dynamic>);
 		randomFuzzer.Fuzz();
 	}
 }
