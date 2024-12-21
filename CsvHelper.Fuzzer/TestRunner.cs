@@ -6,7 +6,7 @@ namespace CsvHelper.Fuzzer;
 
 class TestRunner
 {
-	private static ExecutionResult ExecuteParser(string path)
+	private static ExecutionResult Execute(string path)
 	{
 		try
 		{
@@ -15,9 +15,8 @@ class TestRunner
 			{
 				// TODO implement series of random calls
 				var records = csv.GetRecords<string>();
+				return ExecutionResult.Success.WithPayload(records);
 			}
-
-			return ExecutionResult.Success;
 		}
 		catch (Exception e)
 		{
@@ -27,7 +26,7 @@ class TestRunner
 
 	static void Main(string[] args)
 	{
-		var randomFuzzer = new CsvRandomFuzzer(new RandomGenerator(new Random()), ExecuteParser);
+		var randomFuzzer = new CsvRandomFuzzer(new RandomGenerator(new Random(41)), Execute);
 		randomFuzzer.Fuzz();
 	}
 }

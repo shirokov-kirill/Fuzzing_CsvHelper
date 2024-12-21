@@ -4,6 +4,7 @@ public class ExecutionResult
 {
 	private string myId;
 	public Exception? Exception { get; private set; }
+	public object? Payload { get; private set; }
 
 	private ExecutionResult(string id)
 	{
@@ -21,6 +22,13 @@ public class ExecutionResult
 	{
 		if(myId == "Failed")
 			Exception = exception;
+		return this;
+	}
+
+	public ExecutionResult WithPayload(object payload)
+	{
+		if (myId == "Success")
+			Payload = payload;
 		return this;
 	}
 }
