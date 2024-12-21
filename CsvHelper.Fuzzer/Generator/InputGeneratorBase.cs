@@ -17,9 +17,9 @@ public class InputGeneratorBase: IInputGenerator
 		return filePath;
 	}
 
-	public virtual (string, object) Generate()
+	public virtual IFuzzGeneratorContext Generate()
 	{
 		var filePath = CreateEmptyFile();
-		return (filePath, new List<string>());
+		return new RandomGeneratorContext(filePath);
 	}
 }

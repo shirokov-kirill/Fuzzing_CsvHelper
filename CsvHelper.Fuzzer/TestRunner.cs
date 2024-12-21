@@ -34,9 +34,18 @@ class TestRunner
 
 		try
 		{
-			var expectedListResult = expectedResult as List<T>;
+			var expectedListResult = expectedResult as List<IDictionary<string, object>?>;
 			var records = Run<T>(csv).ToList();
-			if (expectedListResult?.SequenceEqual(records) ?? false)
+			var isEqual = records.Count == (expectedListResult?.Count ?? 0);
+			for (int i = 0; i < records.Count; i++)
+			{
+				var expResult = expectedListResult?.ElementAtOrDefault(i);
+				var actResult = records[i] as IDictionary<string, object>;
+				if((expResult == null && actResult == null) || (actResult != null && (expResult?.SequenceEqual(actResult) ?? false)))
+					continue;
+				isEqual = false;
+			}
+			if (isEqual)
 			{
 				return ExecutionResult<T>.Success.WithPayload(records);
 			}

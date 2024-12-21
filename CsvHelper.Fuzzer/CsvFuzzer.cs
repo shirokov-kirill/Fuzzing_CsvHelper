@@ -12,8 +12,9 @@ public class CsvFuzzer<T>(IInputGenerator generator, Func<string, object, Execut
 		var maxCount = 1000;
 		while (counter < maxCount)
 		{
-			var (path, expectedResult) = generator.Generate();
-			var result = target(path, expectedResult);
+			var context = generator.Generate();
+			var path = context.ToCsv();
+			var result = target(path, context.GetExpectedResult());
 			if (result == ExecutionResult<T>.Failed)
 			{
 				Console.WriteLine($"Run number {counter}");
