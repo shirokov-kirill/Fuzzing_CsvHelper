@@ -6,7 +6,7 @@ namespace CsvHelper.Fuzzer.Generator;
 
 public class RandomGenerator(Random random): IInputGenerator
 {
-	public string Generate()
+	public (string, object) Generate()
 	{
 		var linesCount = random.Next(500);
 		var lines = new string[linesCount];
@@ -31,6 +31,8 @@ public class RandomGenerator(Random random): IInputGenerator
 			file.WriteLine(line);
 		}
 
-		return filePath;
+		// TODO improve with check on correct .csv
+		var isEmpty = lines.Length == 0;
+		return (filePath, isEmpty ? new List<string>() : false);
 	}
 }
