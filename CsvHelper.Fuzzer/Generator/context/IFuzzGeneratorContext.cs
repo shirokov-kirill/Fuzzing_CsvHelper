@@ -1,4 +1,4 @@
-namespace CsvHelper.Fuzzer.Generator;
+namespace CsvHelper.Fuzzer.Generator.context;
 
 public interface IFuzzGeneratorContext
 {

@@ -1,7 +1,6 @@
-using System.Text;
 using CsvHelper.Fuzzer.Generator.specification;
 
-namespace CsvHelper.Fuzzer.Generator;
+namespace CsvHelper.Fuzzer.Generator.context;
 
 /// <summary>
 /// Main class to perform mutations on generated data.<br />

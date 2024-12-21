@@ -1,4 +1,4 @@
-namespace CsvHelper.Fuzzer.Generator;
+namespace CsvHelper.Fuzzer.Generator.context;
 
 public class RandomGeneratorContext(string path): IFuzzGeneratorContext
 {

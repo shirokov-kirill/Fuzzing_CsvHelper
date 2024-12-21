@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using CsvHelper.Fuzzer.Generator.context;
 using CsvHelper.Fuzzer.Generator.specification;
 
 namespace CsvHelper.Fuzzer.Generator;
