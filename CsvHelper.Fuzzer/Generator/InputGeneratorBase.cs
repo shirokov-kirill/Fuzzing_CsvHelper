@@ -2,27 +2,30 @@ using CsvHelper.Fuzzer.Generator.context;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public abstract class InputGeneratorBase: IInputGenerator
+public abstract class InputGeneratorBase(Random random): IInputGenerator
 {
 	protected abstract MemoryStream Stream { get; }
 	protected int MaxLinesCount = 2000;
 
-	protected string CreateEmptyFile()
-	{
-		// create storage folder if none exists
-		string storagePath =GeneratorUtils.GetPathToStorage();
-		bool exists = System.IO.Directory.Exists(storagePath);
-		if(!exists)
-			System.IO.Directory.CreateDirectory(storagePath);
-
-		var filePath = storagePath + @"\input.csv";
-		File.Create(filePath).Close();
-		return filePath;
-	}
-
 	public virtual IFuzzGeneratorContext Generate()
 	{
-		var filePath = CreateEmptyFile();
 		return new RandomGeneratorContext(Stream);
+	}
+
+	public int RandomInteger()
+	{
+		return random.Next();
+	}
+
+	public string RandomString(int maxLength)
+	{
+		var length = random.Next(maxLength);
+		return GeneratorUtils.GetRandomString(random, length);
+	}
+
+	public virtual IFuzzGeneratorContext Generate(Func<IEnumerable<string>> generateRawHeader, Func<IEnumerable<string>> generateRecord, int numberOfRecords)
+	{
+		var context = new RandomGeneratorContext(Stream);
+		return context;
 	}
 }

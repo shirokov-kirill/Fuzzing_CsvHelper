@@ -1,36 +1,43 @@
-using System.Text;
+using System.Globalization;
 using CsvHelper.Fuzzer.Generator;
-using CsvHelper.Fuzzer.Generator.context;
-using CsvHelper.Fuzzer.Tests;
 using CsvHelper.Fuzzer.Tracing;
 using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Fuzzer;
 
-public class CsvFuzzer(Random random, IInputGenerator generator, MemoryStream stream, CsvReader csvReader, CsvWriter csvWriter)
+public class CsvFuzzer(Random random)
 {
-	public void Fuzz(StreamWriter streamWriter, StreamReader streamReader)
+	public void Fuzz()
 	{
-		var globalCounter = 0;
 		var traceCollector = new TraceCollector(FuzzingLogsCollector.Instance);
+		var errorsLogger = new ErrorsLogger();
 
 		while (traceCollector.ShouldRepeat())
 		{
-			stream.Flush();
-			stream.Position = 0;
-			traceCollector.Next();
-			var scenario = TestScenarios.GetRandomScenario(random);
-			var scenarioResult = scenario.Func.Invoke(csvWriter, csvReader, generator);
-			var resultEvaluator = TestScenarioResultEvaluator.GetEvaluator(scenario.ScenarioKey);
-			var isFail = resultEvaluator.Invoke(scenarioResult);
-			if (isFail)
+			using var stream = new MemoryStream();
+			using var writer = new StreamWriter(stream);
+			using var reader = new StreamReader(stream);
+			using var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
+			using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
 			{
-				Console.WriteLine($"Run number {globalCounter} failed.");
-				// todo log it
+				var generator = new SpecificationBasedGenerator(stream, writer, random);
+
+				traceCollector.Next();
+				var scenario = TestScenarios.GetRandomScenario(random);
+				try
+				{
+					var (scenarioResult, input) = scenario.Func.Invoke(csvWriter, csvReader, generator);
+					var resultEvaluator = TestScenarioResultEvaluator.GetEvaluator(scenario.ScenarioKey);
+					var isFail = resultEvaluator.Invoke(scenarioResult);
+					if (isFail)
+					{
+						errorsLogger.LogReadError(scenario.ScenarioKey, input);
+					}
+				}
+				catch (Exception e) { }
+				traceCollector.Commit();
+				Console.WriteLine(traceCollector.GetStatistics());
 			}
-			traceCollector.Commit();
-			globalCounter++;
-			Console.WriteLine(traceCollector.GetStatistics());
 		}
 		Console.WriteLine(traceCollector.GetStatistics());
 	}

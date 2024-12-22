@@ -5,7 +5,7 @@ using CsvHelper.Fuzzer.Generator.specification;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public class SpecificationBasedGenerator(MemoryStream stream, StreamWriter writer, Random random): InputGeneratorBase
+public class SpecificationBasedGenerator(MemoryStream stream, StreamWriter writer, Random random): InputGeneratorBase(random)
 {
 	protected override MemoryStream Stream => stream;
 	private readonly CsvSpecificationOwner myCsvSpecificationOwner = new CsvSpecificationOwner(SpecificationType.RFC_4180);
@@ -48,5 +48,21 @@ public class SpecificationBasedGenerator(MemoryStream stream, StreamWriter write
 	{
 		var length = random.Next(0, 50);
 		return GeneratorUtils.GetRandomString(random, length);
+	}
+
+	public override IFuzzGeneratorContext Generate(Func<IEnumerable<string>> generateRawHeader, Func<IEnumerable<string>> generateRecord, int numberOfRecords)
+	{
+		var context = new CsvGeneratorContext(writer, Stream, myCsvSpecificationOwner);
+		foreach (var name in generateRawHeader())
+		{
+			context.AddFieldName(name);
+		}
+
+		for (int i = 0; i < numberOfRecords; i++)
+		{
+			context.AddRecord(generateRecord().ToList());
+		}
+
+		return context;
 	}
 }

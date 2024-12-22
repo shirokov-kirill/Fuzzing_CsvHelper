@@ -16,4 +16,5 @@ public interface IFuzzGeneratorContext
 	/// list of entries - if csv file should be parsed
 	/// </returns>
 	public object GetExpectedResult();
+	public string GetInput();
 }

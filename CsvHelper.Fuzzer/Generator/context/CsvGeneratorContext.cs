@@ -1,3 +1,4 @@
+using System.Text;
 using CsvHelper.Fuzzer.Generator.specification;
 
 namespace CsvHelper.Fuzzer.Generator.context;
@@ -17,17 +18,18 @@ public class CsvGeneratorContext(
 	private readonly List<string> myFieldNames = new List<string>();
 	private readonly List<List<string>> myRecords = new List<List<string>>();
 
-	private List<string> MyLines => Compile();
+	private List<string> MyLines = new List<string>();
 
 	public void ToCsv()
 	{
 		if (!isCompiled)
+			Compile();
+		foreach (var line in MyLines)
 		{
-			foreach (var line in MyLines)
-			{
-				writer.WriteLine(line);
-			}
+			writer.WriteLine(line);
 		}
+		writer.Flush();
+		stream.Position = 0;
 	}
 
 	public object GetExpectedResult()
@@ -48,6 +50,18 @@ public class CsvGeneratorContext(
 		return resultsList;
 	}
 
+	public string GetInput()
+	{
+		if(!isCompiled)
+			Compile();
+		var sb = new StringBuilder();
+		foreach (var line in MyLines)
+		{
+			sb.AppendLine(line);
+		}
+		return sb.ToString();
+	}
+
 	public void AddFieldName(string generatedName)
 	{
 		if(!isCompiled)
@@ -60,10 +74,9 @@ public class CsvGeneratorContext(
 			myRecords.Add(record);
 	}
 
-	private List<string> Compile()
+	private void Compile()
 	{
 		isCompiled = true;
-		var lines = new List<string>();
 
 		// Generate header
 		// Some sources on the internet state both with and without header csv are OK, while others state that header is a mandatory part.
@@ -73,10 +86,9 @@ public class CsvGeneratorContext(
 			fieldNames.Add(myFormatter.FormatFieldName(myFieldNames[i]));
 		}
 		var headerLine = myFormatter.FormatHeader(fieldNames);
-		lines.Add(headerLine);
+		MyLines.Add(headerLine);
 
 		// Generate rows
-		var records  = new List<List<string>>();
 		for (int i = 0; i < myRecords.Count; i++)
 		{
 			var fields = new List<string>();
@@ -84,9 +96,7 @@ public class CsvGeneratorContext(
 			{
 				fields.Add(myFormatter.FormatField(myRecords[i][j]));
 			}
-			lines.Add(myFormatter.FormatRow(fields));
+			MyLines.Add(myFormatter.FormatRow(fields));
 		}
-
-		return lines;
 	}
 }

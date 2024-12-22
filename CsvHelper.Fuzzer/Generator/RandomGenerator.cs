@@ -2,7 +2,7 @@ using CsvHelper.Fuzzer.Generator.context;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public class RandomGenerator(Random random, MemoryStream stream): InputGeneratorBase
+public class RandomGenerator(Random random, MemoryStream stream): InputGeneratorBase(random)
 {
 	protected override MemoryStream Stream => stream;
 
