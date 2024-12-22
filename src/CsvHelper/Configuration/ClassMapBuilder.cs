@@ -5,6 +5,7 @@
 using CsvHelper.TypeConversion;
 using System.Collections;
 using System.Linq.Expressions;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -59,7 +60,7 @@ public interface IHasTypeConverter<TClass, TMember> : IBuildableClass<TClass>
 	/// Specifies the <see cref="TypeConverter"/> to use
 	/// when converting the member to and from a CSV field.
 	/// </summary>
-	/// <typeparam name="TConverter">The <see cref="System.Type"/> of the 
+	/// <typeparam name="TConverter">The <see cref="System.Type"/> of the
 	/// <see cref="TypeConverter"/> to use.</typeparam>
 	IHasTypeConverterOptions<TClass, TMember> TypeConverter<TConverter>() where TConverter : ITypeConverter;
 }
@@ -144,7 +145,7 @@ public interface IHasName<TClass, TMember> : IBuildableClass<TClass>
 	/// at the index of the name if there was a
 	/// header specified. It will look for the
 	/// first name match in the order listed.
-	/// When writing, sets the name of the 
+	/// When writing, sets the name of the
 	/// field in the header record.
 	/// The first name will be used.
 	/// </summary>
@@ -173,8 +174,8 @@ public interface IHasNameOptions<TClass, TMember> :
 public interface IHasNameIndex<TClass, TMember> : IBuildableClass<TClass>
 {
 	/// <summary>
-	/// When reading, is used to get the 
-	/// index of the name used when there 
+	/// When reading, is used to get the
+	/// index of the name used when there
 	/// are multiple names that are the same.
 	/// </summary>
 	/// <param name="index">The index of the name.</param>
@@ -257,8 +258,8 @@ public interface IHasDefaultOptions<TClass, TMember> :
 public interface IHasConstant<TClass, TMember> : IBuildableClass<TClass>
 {
 	/// <summary>
-	/// The constant value that will be used for every record when 
-	/// reading and writing. This value will always be used no matter 
+	/// The constant value that will be used for every record when
+	/// reading and writing. This value will always be used no matter
 	/// what other mapping configurations are specified.
 	/// </summary>
 	/// <param name="value">The constant value.</param>
@@ -300,16 +301,19 @@ internal class ClassMapBuilder<TClass> : IHasMap<TClass>
 
 	public ClassMapBuilder()
 	{
+		FuzzingLogsCollector.Log("ClassMapBuilder<TClass>", "ClassMapBuilder", 304);
 		map = new BuilderClassMap<TClass>();
 	}
 
 	public IHasMapOptions<TClass, TMember> Map<TMember>(Expression<Func<TClass, TMember?>> expression, bool useExistingMap = true)
 	{
+		FuzzingLogsCollector.Log("ClassMapBuilder<TClass>", "Map", 310);
 		return new MemberMapBuilder<TClass, TMember>(map, map.Map(expression, useExistingMap));
 	}
 
 	public ClassMap<TClass> Build()
 	{
+		FuzzingLogsCollector.Log("ClassMapBuilder<TClass>", "Build", 316);
 		return map;
 	}
 
@@ -340,6 +344,7 @@ internal class MemberMapBuilder<TClass, TMember> :
 
 	public MemberMapBuilder(ClassMap<TClass> classMap, MemberMap<TClass, TMember> memberMap)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "MemberMapBuilder", 347);
 		this.classMap = classMap;
 		this.memberMap = memberMap;
 	}
@@ -347,84 +352,98 @@ internal class MemberMapBuilder<TClass, TMember> :
 #pragma warning disable CS0693 // Type parameter has the same name as the type parameter from outer type
 	public IHasMapOptions<TClass, TMember> Map<TMember>(Expression<Func<TClass, TMember?>> expression, bool useExistingMap = true)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Map", 355);
 		return new MemberMapBuilder<TClass, TMember>(classMap, classMap.Map(expression, useExistingMap));
 	}
 #pragma warning restore CS0693 // Type parameter has the same name as the type parameter from outer type
 
 	public IHasMap<TClass> ConvertUsing(ConvertFromString<TMember> convertExpression)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "ConvertUsing", 362);
 		memberMap.Convert(convertExpression);
 		return this;
 	}
 
 	public IHasMap<TClass> ConvertUsing(ConvertToString<TClass> convertExpression)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "ConvertUsing", 369);
 		memberMap.Convert(convertExpression);
 		return this;
 	}
 
 	public IHasDefaultOptions<TClass, TMember> Default(TMember defaultValue)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Default", 376);
 		memberMap.Default(defaultValue);
 		return this;
 	}
 
 	public IHasDefaultOptions<TClass, TMember> Default(string defaultValue)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Default", 383);
 		memberMap.Default(defaultValue);
 		return this;
 	}
 
 	public IHasIndexOptions<TClass, TMember> Index(int index, int indexEnd = -1)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Index", 390);
 		memberMap.Index(index, indexEnd);
 		return this;
 	}
 
 	public IHasNameOptions<TClass, TMember> Name(params string[] names)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Name", 397);
 		memberMap.Name(names);
 		return this;
 	}
 
 	public IHasNameIndexOptions<TClass, TMember> NameIndex(int index)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "NameIndex", 404);
 		memberMap.NameIndex(index);
 		return this;
 	}
 
 	public IHasOptionalOptions<TClass, TMember> Optional()
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Optional", 411);
 		memberMap.Optional();
 		return this;
 	}
 
 	public IHasTypeConverterOptions<TClass, TMember> TypeConverter(ITypeConverter typeConverter)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "TypeConverter", 418);
 		memberMap.TypeConverter(typeConverter);
 		return this;
 	}
 
 	public IHasTypeConverterOptions<TClass, TMember> TypeConverter<TConverter>() where TConverter : ITypeConverter
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "TypeConverter", 425);
 		memberMap.TypeConverter<TConverter>();
 		return this;
 	}
 
 	public IHasMap<TClass> Constant(TMember value)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Constant", 432);
 		memberMap.Constant(value);
 		return this;
 	}
 
 	public IHasMap<TClass> Validate(Validate validateExpression)
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Validate", 439);
 		memberMap.Validate(validateExpression);
 		return this;
 	}
 
 	public ClassMap<TClass> Build()
 	{
+		FuzzingLogsCollector.Log("MemberMapBuilder<TClass, TMember>", "Build", 446);
 		return classMap;
 	}
 }

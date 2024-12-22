@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper.Configuration;
 
 /// <summary>
@@ -16,23 +19,24 @@ internal class MemberMapComparer : IComparer<MemberMap>
 	/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
 	/// </summary>
 	/// <returns>
-	/// Value 
-	///                     Condition 
-	///                     Less than zero 
-	///                 <paramref name="x"/> is less than <paramref name="y"/>. 
-	///                     Zero 
-	///                 <paramref name="x"/> equals <paramref name="y"/>. 
-	///                     Greater than zero 
-	///                 <paramref name="x"/> is greater than <paramref name="y"/>. 
+	/// Value
+	///                     Condition
+	///                     Less than zero
+	///                 <paramref name="x"/> is less than <paramref name="y"/>.
+	///                     Zero
+	///                 <paramref name="x"/> equals <paramref name="y"/>.
+	///                     Greater than zero
+	///                 <paramref name="x"/> is greater than <paramref name="y"/>.
 	/// </returns>
-	/// <param name="x">The first object to compare. 
-	///                 </param><param name="y">The second object to compare. 
+	/// <param name="x">The first object to compare.
+	///                 </param><param name="y">The second object to compare.
 	///                 </param><exception cref="T:System.ArgumentException">Neither <paramref name="x"/> nor <paramref name="y"/> implements the <see cref="T:System.IComparable"/> interface.
-	///                     -or- 
-	///                 <paramref name="x"/> and <paramref name="y"/> are of different types and neither one can handle comparisons with the other. 
+	///                     -or-
+	///                 <paramref name="x"/> and <paramref name="y"/> are of different types and neither one can handle comparisons with the other.
 	///                 </exception><filterpriority>2</filterpriority>
 	public virtual int Compare(object x, object y)
 	{
+		FuzzingLogsCollector.Log("MemberMapComparer", "Compare", 39);
 		var xMember = x as MemberMap;
 		var yMember = y as MemberMap;
 
@@ -43,8 +47,8 @@ internal class MemberMapComparer : IComparer<MemberMap>
 	/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
 	/// </summary>
 	/// <returns>
-	/// Value 
-	///                     Condition 
+	/// Value
+	///                     Condition
 	///                     Less than zero
 	///                 <paramref name="x"/> is less than <paramref name="y"/>.
 	///                     Zero
@@ -57,16 +61,20 @@ internal class MemberMapComparer : IComparer<MemberMap>
 	///                 </param>
 	public virtual int Compare(MemberMap? x, MemberMap? y)
 	{
+		FuzzingLogsCollector.Log("MemberMapComparer", "Compare", 64);
 		if (x == null)
 		{
+			FuzzingLogsCollector.Log("MemberMapComparer", "Compare", 67);
 			throw new ArgumentNullException(nameof(x));
 		}
 
 		if (y == null)
 		{
+			FuzzingLogsCollector.Log("MemberMapComparer", "Compare", 73);
 			throw new ArgumentNullException(nameof(y));
 		}
 
+		FuzzingLogsCollector.Log("MemberMapComparer", "Compare", 77);
 		return x.Data.Index.CompareTo(y.Data.Index);
 	}
 }

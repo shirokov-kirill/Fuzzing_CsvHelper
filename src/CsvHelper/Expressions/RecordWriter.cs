@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper.Expressions;
 
 /// <summary>
@@ -28,30 +31,35 @@ public abstract class RecordWriter
 	/// <param name="writer">The writer.</param>
 	public RecordWriter(CsvWriter writer)
 	{
+		FuzzingLogsCollector.Log("RecordWriter", "RecordWriter", 31);
 		Writer = writer;
 		ExpressionManager = ObjectResolver.Current.Resolve<ExpressionManager>(writer);
 	}
 
 	/// <summary>
-	/// Gets the delegate to write the given record. 
+	/// Gets the delegate to write the given record.
 	/// If the delegate doesn't exist, one will be created and cached.
 	/// </summary>
 	/// <typeparam name="T">The record type.</typeparam>
 	/// <param name="typeInfo">The type for the record.</param>
 	public virtual Action<T> GetWriteDelegate<T>(RecordTypeInfo typeInfo)
 	{
+		FuzzingLogsCollector.Log("RecordWriter", "GetWriteDelegate<T>", 47);
 		var typeKey = typeInfo.HashCode;
 
 		if (typeInfo.IsObject)
 		{
+			FuzzingLogsCollector.Log("RecordWriter", "GetWriteDelegate<T>", 52);
 			typeKey = HashCode.Combine(objectHashCode, typeKey);
 		}
 
 		if (!typeActions.TryGetValue(typeKey, out Delegate? action))
 		{
+			FuzzingLogsCollector.Log("RecordWriter", "GetWriteDelegate<T>", 58);
 			typeActions[typeKey] = action = CreateWriteDelegate<T>(typeInfo.RecordType);
 		}
 
+		FuzzingLogsCollector.Log("RecordWriter", "GetWriteDelegate<T>", 62);
 		return (Action<T>)action;
 	}
 
@@ -63,6 +71,7 @@ public abstract class RecordWriter
 	/// <param name="record">The record.</param>
 	protected virtual Action<T> CreateWriteDelegate<T>(T record)
 	{
+		FuzzingLogsCollector.Log("RecordWriter", "CreateWriteDelegate<T>", 74);
 		return CreateWriteDelegate<T>(Writer.GetTypeInfoForRecord(record).RecordType);
 	}
 
@@ -82,6 +91,7 @@ public abstract class RecordWriter
 	/// <returns>A multicast delegate combined from the given delegates.</returns>
 	protected virtual Action<T>? CombineDelegates<T>(IEnumerable<Action<T>> delegates)
 	{
-		return (Action<T>?)delegates.Aggregate<Delegate, Delegate?>(null, Delegate.Combine);;
+		FuzzingLogsCollector.Log("RecordWriter", "CombineDelegates<T>", 94);
+		return (Action<T>?)delegates.Aggregate<Delegate, Delegate?>(null, Delegate.Combine);
 	}
 }

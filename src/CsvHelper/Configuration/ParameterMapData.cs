@@ -5,6 +5,7 @@
 using CsvHelper.TypeConversion;
 using System.Diagnostics;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -99,6 +100,7 @@ public class ParameterMapData
 	/// <param name="parameter">The constructor parameter.</param>
 	public ParameterMapData(ParameterInfo parameter)
 	{
+		FuzzingLogsCollector.Log("ParameterMapData", "ParameterMapData", 103);
 		Parameter = parameter;
 	}
 }

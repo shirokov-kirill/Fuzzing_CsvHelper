@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper.Expressions;
 
 /// <summary>
@@ -23,22 +26,27 @@ public class ExpandoObjectRecordWriter : RecordWriter
 	/// <param name="recordType">The record.</param>
 	protected override Action<T> CreateWriteDelegate<T>(Type recordType)
 	{
+		FuzzingLogsCollector.Log("ExpandoObjectRecordWriter", "CreateWriteDelegate<T>", 29);
 		Action<T> action = r =>
 		{
+			FuzzingLogsCollector.Log("ExpandoObjectRecordWriter", "CreateWriteDelegate<T>", 32);
 			var dict = ((IDictionary<string, object>)r!).AsEnumerable();
 
 			if (Writer.Configuration.DynamicPropertySort != null)
 			{
+				FuzzingLogsCollector.Log("ExpandoObjectRecordWriter", "CreateWriteDelegate<T>", 37);
 				dict = dict.OrderBy(pair => pair.Key, Writer.Configuration.DynamicPropertySort);
 			}
 
 			var values = dict.Select(pair => pair.Value);
 			foreach (var val in values)
 			{
+				FuzzingLogsCollector.Log("ExpandoObjectRecordWriter", "CreateWriteDelegate<T>", 44);
 				Writer.WriteField(val);
 			}
 		};
 
+		FuzzingLogsCollector.Log("ExpandoObjectRecordWriter", "CreateWriteDelegate<T>", 49);
 		return action;
 	}
 }

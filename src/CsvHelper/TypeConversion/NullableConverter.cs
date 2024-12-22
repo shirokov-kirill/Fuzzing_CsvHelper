@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -43,13 +44,16 @@ public class NullableConverter : DefaultTypeConverter
 	/// <exception cref="System.ArgumentException">type is not a nullable type.</exception>
 	public NullableConverter(Type type, TypeConverterCache typeConverterFactory)
 	{
+		FuzzingLogsCollector.Log("NullableConverter", "NullableConverter", 47);
 		NullableType = type;
 		UnderlyingType = Nullable.GetUnderlyingType(type);
 		if (UnderlyingType == null)
 		{
+			FuzzingLogsCollector.Log("NullableConverter", "NullableConverter", 52);
 			throw new ArgumentException("type is not a nullable type.");
 		}
 
+		FuzzingLogsCollector.Log("NullableConverter", "NullableConverter", 56);
 		UnderlyingTypeConverter = typeConverterFactory.GetConverter(UnderlyingType);
 	}
 
@@ -62,19 +66,24 @@ public class NullableConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("NullableConverter", "ConvertFromString", 69);
 		if (string.IsNullOrEmpty(text))
 		{
+			FuzzingLogsCollector.Log("NullableConverter", "ConvertFromString", 72);
 			return null;
 		}
 
 		foreach (var nullValue in memberMapData.TypeConverterOptions.NullValues)
 		{
+			FuzzingLogsCollector.Log("NullableConverter", "ConvertFromString", 78);
 			if (text == nullValue)
 			{
+				FuzzingLogsCollector.Log("NullableConverter", "ConvertFromString", 81);
 				return null;
 			}
 		}
 
+		FuzzingLogsCollector.Log("NullableConverter", "ConvertFromString", 86);
 		return UnderlyingTypeConverter.ConvertFromString(text, row, memberMapData);
 	}
 
@@ -87,6 +96,7 @@ public class NullableConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("NullableConverter", "ConvertToString", 99);
 		return UnderlyingTypeConverter.ConvertToString(value, row, memberMapData);
 	}
 }

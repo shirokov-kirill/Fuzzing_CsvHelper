@@ -5,6 +5,7 @@
 using CsvHelper.TypeConversion;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -20,21 +21,26 @@ public class MemberMapData
 	{
 		get
 		{
+			FuzzingLogsCollector.Log("MemberMapData", "get", 24);
 			if (Member != null)
 			{
+				FuzzingLogsCollector.Log("MemberMapData", "get", 27);
 				return Member.MemberType();
 			}
 
 			if (IsConstantSet)
 			{
+				FuzzingLogsCollector.Log("MemberMapData", "get", 33);
 				return Constant?.GetType() ?? typeof(string);
 			}
 
 			if (IsDefaultSet)
 			{
+				FuzzingLogsCollector.Log("MemberMapData", "get", 39);
 				return Default?.GetType() ?? typeof(string);
 			}
 
+			FuzzingLogsCollector.Log("MemberMapData", "get", 43);
 			return typeof(string);
 		}
 	}
@@ -160,6 +166,7 @@ public class MemberMapData
 	/// <param name="member">The member.</param>
 	public MemberMapData(MemberInfo? member)
 	{
+		FuzzingLogsCollector.Log("MemberMapData", "MemberMapData", 169);
 		Member = member;
 	}
 }

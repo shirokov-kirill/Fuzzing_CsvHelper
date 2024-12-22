@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Diagnostics;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -23,16 +24,20 @@ public class ParameterReferenceMapData
 		get { return prefix; }
 		set
 		{
+			FuzzingLogsCollector.Log("ParameterReferenceMapData", "set", 27);
 			prefix = value;
 			foreach (var memberMap in Mapping.MemberMaps)
 			{
+				FuzzingLogsCollector.Log("ParameterReferenceMapData", "set", 31);
 				memberMap.Data.Names.Prefix = value;
 			}
 
 			if (Inherit)
 			{
+				FuzzingLogsCollector.Log("ParameterReferenceMapData", "set", 37);
 				foreach (var memberRef in Mapping.ReferenceMaps)
 				{
+					FuzzingLogsCollector.Log("ParameterReferenceMapData", "set", 40);
 					memberRef.Data.Prefix = memberRef.Data.Prefix == null ? value : string.Concat(value, memberRef.Data.Prefix);
 				}
 			}
@@ -63,6 +68,7 @@ public class ParameterReferenceMapData
 	/// <param name="mapping">The mapping this is a reference for.</param>
 	public ParameterReferenceMapData(ParameterInfo parameter, ClassMap mapping)
 	{
+		FuzzingLogsCollector.Log("ParameterReferenceMapData", "ParameterReferenceMapData", 71);
 		Parameter = parameter;
 		Mapping = mapping;
 	}

@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -23,6 +24,7 @@ public class NotSupportedTypeConverter<T> : TypeConverter<T>
 	/// <returns>The object created from the string.</returns>
 	public override T ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("NotSupportedTypeConverter<T>", "ConvertFromString", 27);
 		var message =
 			$"Converting {typeof(T).FullName} is not supported. " +
 			"If you want to do this, create your own ITypeConverter and register " +
@@ -39,6 +41,7 @@ public class NotSupportedTypeConverter<T> : TypeConverter<T>
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(T? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("NotSupportedTypeConverter<T>", "ConvertToString", 44);
 		var message =
 			$"Converting {typeof(T).FullName} is not supported. " +
 			"If you want to do this, create your own ITypeConverter and register " +

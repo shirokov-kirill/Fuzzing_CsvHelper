@@ -5,6 +5,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System.Linq.Expressions;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -27,6 +28,7 @@ public class PrimitiveRecordCreator : RecordCreator
 	/// <param name="recordType">The record type.</param>
 	protected override Delegate CreateCreateRecordDelegate(Type recordType)
 	{
+		FuzzingLogsCollector.Log("PrimitiveRecordCreator", "CreateCreateRecordDelegate", 31);
 		var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) })!.GetGetMethod()!;
 		Expression fieldExpression = Expression.Call(Expression.Constant(Reader), method, Expression.Constant(0, typeof(int)));
 
@@ -42,6 +44,7 @@ public class PrimitiveRecordCreator : RecordCreator
 
 		var funcType = typeof(Func<>).MakeGenericType(recordType);
 
+		FuzzingLogsCollector.Log("PrimitiveRecordCreator", "CreateCreateRecordDelegate", 47);
 		return Expression.Lambda(funcType, fieldExpression).Compile();
 	}
 }

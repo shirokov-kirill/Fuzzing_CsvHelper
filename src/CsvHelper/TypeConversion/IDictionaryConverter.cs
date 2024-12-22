@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,17 +22,21 @@ public class IDictionaryConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertToString", 25);
 		var dictionary = value as IDictionary;
 		if (dictionary == null)
 		{
+			FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertToString", 29);
 			return base.ConvertToString(value, row, memberMapData);
 		}
 
 		foreach (DictionaryEntry entry in dictionary)
 		{
+			FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertToString", 35);
 			row.WriteField(entry.Value);
 		}
 
+		FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertToString", 39);
 		return null;
 	}
 
@@ -44,6 +49,7 @@ public class IDictionaryConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertFromString", 52);
 		var dictionary = new Dictionary<string, string?>();
 
 		var indexEnd = memberMapData.IndexEnd < memberMapData.Index
@@ -52,12 +58,15 @@ public class IDictionaryConverter : DefaultTypeConverter
 
 		for (var i = memberMapData.Index; i <= indexEnd; i++)
 		{
+			FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertFromString", 61);
 			if (row.TryGetField(i, out string? field))
 			{
+				FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertFromString", 64);
 				dictionary.Add(row.HeaderRecord![i], field);
 			}
 		}
 
+		FuzzingLogsCollector.Log("IDictionaryConverter", "ConvertFromString", 69);
 		return dictionary;
 	}
 }

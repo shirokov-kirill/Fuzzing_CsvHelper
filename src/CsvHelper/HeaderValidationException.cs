@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper;
 
 /// <summary>
@@ -21,6 +24,7 @@ public class HeaderValidationException : ValidationException
 	/// <param name="invalidHeaders">The invalid headers.</param>
 	public HeaderValidationException(CsvContext context, InvalidHeader[] invalidHeaders) : base(context)
 	{
+		FuzzingLogsCollector.Log("HeaderValidationException", "HeaderValidationException", 27);
 		InvalidHeaders = invalidHeaders;
 	}
 
@@ -33,12 +37,13 @@ public class HeaderValidationException : ValidationException
 	/// <param name="message">The message that describes the error.</param>
 	public HeaderValidationException(CsvContext context, InvalidHeader[] invalidHeaders, string message) : base(context, message)
 	{
+		FuzzingLogsCollector.Log("HeaderValidationException", "HeaderValidationException", 40);
 		InvalidHeaders = invalidHeaders;
 	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ValidationException"/> class
-	/// with a specified error message and a reference to the inner exception that 
+	/// with a specified error message and a reference to the inner exception that
 	/// is the cause of this exception.
 	/// </summary>
 	/// <param name="context">The reading context.</param>
@@ -47,6 +52,7 @@ public class HeaderValidationException : ValidationException
 	/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 	public HeaderValidationException(CsvContext context, InvalidHeader[] invalidHeaders, string message, Exception innerException) : base(context, message, innerException)
 	{
+		FuzzingLogsCollector.Log("HeaderValidationException", "HeaderValidationException", 55);
 		InvalidHeaders = invalidHeaders;
 	}
 }

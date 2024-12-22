@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Linq.Expressions;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -25,17 +26,21 @@ public class ObjectRecordCreator : RecordCreator
 	/// <param name="recordType">The record type.</param>
 	protected override Delegate CreateCreateRecordDelegate(Type recordType)
 	{
+		FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 29);
 		if (Reader.Context.Maps[recordType] == null)
 		{
+			FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 32);
 			Reader.Context.Maps.Add(Reader.Context.AutoMap(recordType));
 		}
 
+		FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 36);
 		var map = Reader.Context.Maps[recordType]!; // The map is added above.
 
 		Expression body;
 
 		if (map.ParameterMaps.Count > 0)
 		{
+			FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 43);
 			// This is a constructor parameter type.
 			var arguments = new List<Expression>();
 			ExpressionManager.CreateConstructorArgumentExpressionsForMapping(map, arguments);
@@ -45,19 +50,23 @@ public class ObjectRecordCreator : RecordCreator
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 53);
 			var assignments = new List<MemberAssignment>();
 			ExpressionManager.CreateMemberAssignmentsForMapping(map, assignments);
 
 			if (assignments.Count == 0)
 			{
+				FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 59);
 				throw new ReaderException(Reader.Context, $"No members are mapped for type '{recordType.FullName}'.");
 			}
 
+			FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 63);
 			body = ExpressionManager.CreateInstanceAndAssignMembers(recordType, assignments);
 		}
 
 		var funcType = typeof(Func<>).MakeGenericType(recordType);
 
+		FuzzingLogsCollector.Log("ObjectRecordCreator", "CreateCreateRecordDelegate", 69);
 		return Expression.Lambda(funcType, body).Compile();
 	}
 }

@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -20,11 +21,14 @@ public class GuidConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("GuidConverter", "ConvertFromString", 24);
 		if (Guid.TryParse(text, out var g))
 		{
+			FuzzingLogsCollector.Log("GuidConverter", "ConvertFromString", 27);
 			return g;
 		}
 
+		FuzzingLogsCollector.Log("GuidConverter", "ConvertFromString", 31);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

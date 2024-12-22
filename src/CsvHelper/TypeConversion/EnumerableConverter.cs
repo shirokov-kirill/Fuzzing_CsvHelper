@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -24,6 +25,7 @@ public class EnumerableConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("EnumerableConverter", "ConvertFromString", 28);
 		var message = "Converting IEnumerable types is not supported for a single field. " +
 					  "If you want to do this, create your own ITypeConverter and register " +
 					  "it in the TypeConverterFactory by calling AddConverter.";
@@ -39,6 +41,7 @@ public class EnumerableConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("EnumerableConverter", "ConvertToString", 44);
 		var message = "Converting IEnumerable types is not supported for a single field. " +
 					  "If you want to do this, create your own ITypeConverter and register " +
 					  "it in the TypeConverterFactory by calling AddConverter.";

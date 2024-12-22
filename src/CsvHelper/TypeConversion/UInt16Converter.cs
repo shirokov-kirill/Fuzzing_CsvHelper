@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,13 +22,16 @@ public class UInt16Converter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("UInt16Converter", "ConvertFromString", 25);
 		var numberStyle = memberMapData.TypeConverterOptions.NumberStyles ?? NumberStyles.Integer;
 
 		if (ushort.TryParse(text, numberStyle, memberMapData.TypeConverterOptions.CultureInfo, out var us))
 		{
+			FuzzingLogsCollector.Log("UInt16Converter", "ConvertFromString", 30);
 			return us;
 		}
 
+		FuzzingLogsCollector.Log("UInt16Converter", "ConvertFromString", 34);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

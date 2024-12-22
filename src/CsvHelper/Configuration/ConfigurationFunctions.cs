@@ -6,6 +6,7 @@ using CsvHelper.Delegates;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -19,19 +20,23 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static void HeaderValidated(HeaderValidatedArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "HeaderValidated", 23);
 		if (args.InvalidHeaders.Count() == 0)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "HeaderValidated", 26);
 			return;
 		}
 
 		var errorMessage = new StringBuilder();
 		foreach (var invalidHeader in args.InvalidHeaders)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "HeaderValidated", 33);
 			errorMessage.AppendLine($"Header with name '{string.Join("' or '", invalidHeader.Names)}'[{invalidHeader.Index}] was not found.");
 		}
 
 		if (args.Context.Reader?.HeaderRecord != null)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "HeaderValidated", 39);
 			errorMessage.AppendLine($"Headers: '{string.Join("', '", args.Context.Reader.HeaderRecord)}'");
 		}
 
@@ -49,12 +54,14 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static void MissingFieldFound(MissingFieldFoundArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "MissingFieldFound", 57);
 		var messagePostfix = $"You can ignore missing fields by setting {nameof(MissingFieldFound)} to null.";
 
 		// Get by index.
 
 		if (args.HeaderNames == null || args.HeaderNames.Length == 0)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "MissingFieldFound", 64);
 			throw new MissingFieldException(args.Context, $"Field at index '{args.Index}' does not exist. {messagePostfix}");
 		}
 
@@ -64,6 +71,7 @@ public static class ConfigurationFunctions
 
 		if (args.HeaderNames.Length == 1)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "MissingFieldFound", 74);
 			throw new MissingFieldException(args.Context, $"Field with name '{args.HeaderNames[0]}'{indexText} does not exist. {messagePostfix}");
 		}
 
@@ -75,6 +83,7 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static void BadDataFound(BadDataFoundArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "BadDataFound", 86);
 		throw new BadDataException(args.Field, args.RawRecord, args.Context, $"You can ignore bad data by setting {nameof(BadDataFound)} to null.");
 	}
 
@@ -83,6 +92,7 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static bool ReadingExceptionOccurred(ReadingExceptionOccurredArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "ReadingExceptionOccurred", 95);
 		return true;
 	}
 
@@ -95,11 +105,13 @@ public static class ConfigurationFunctions
 	/// <returns><c>true</c> if the field should be quoted, otherwise <c>false</c>.</returns>
 	public static bool ShouldQuote(ShouldQuoteArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "ShouldQuote", 108);
 		var config = args.Row.Configuration;
 		var field = args.Field;
 
 		if (field == null || field.Length == 0)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "ShouldQuote", 114);
 			return false;
 		}
 
@@ -121,6 +133,7 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static string PrepareHeaderForMatch(PrepareHeaderForMatchArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "PrepareHeaderForMatch", 108);
 		return args.Header ?? string.Empty;
 	}
 
@@ -136,6 +149,7 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static bool ShouldUseConstructorParameters(ShouldUseConstructorParametersArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "ShouldUseConstructorParameters", 152);
 		return !args.ParameterType.HasParameterlessConstructor()
 			&& args.ParameterType.HasConstructor()
 			&& !args.ParameterType.IsValueType
@@ -153,6 +167,7 @@ public static class ConfigurationFunctions
 	/// </summary>
 	public static ConstructorInfo GetConstructor(GetConstructorArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetConstructor", 170);
 		return args.ClassType.GetConstructorWithMostParameters();
 	}
 
@@ -163,8 +178,10 @@ public static class ConfigurationFunctions
 	/// <param name="args">The args.</param>
 	public static string GetDynamicPropertyName(GetDynamicPropertyNameArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDynamicPropertyName", 181);
 		if (args.Context.Reader?.HeaderRecord == null)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDynamicPropertyName", 184);
 			return $"Field{args.FieldIndex + 1}";
 		}
 
@@ -182,16 +199,19 @@ public static class ConfigurationFunctions
 	/// <param name="args">The args.</param>
 	public static string GetDelimiter(GetDelimiterArgs args)
 	{
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 202);
 		var text = args.Text;
 		var config = args.Configuration;
 
 		if (config.Mode == CsvMode.RFC4180)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 208);
 			// Remove text in between pairs of quotes.
 			text = Regex.Replace(text, $"{config.Quote}.*?{config.Quote}", string.Empty, RegexOptions.Singleline);
 		}
 		else if (config.Mode == CsvMode.Escape)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 214);
 			// Remove escaped characters.
 			text = Regex.Replace(text, $"({config.Escape}.)", string.Empty, RegexOptions.Singleline);
 		}
@@ -199,38 +219,45 @@ public static class ConfigurationFunctions
 		var newLine = config.NewLine;
 		if ((new[] { "\r\n", "\r", "\n" }).Contains(newLine))
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 222);
 			newLine = "\r\n|\r|\n";
 		}
 
 		var lineDelimiterCounts = new List<Dictionary<string, int>>();
 		while (text.Length > 0)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 229);
 			// Since all escaped text has been removed, we can reliably read line by line.
 			var match = Regex.Match(text, newLine);
 			var line = match.Success ? text.Substring(0, match.Index) : text;
 
 			if (line.Length > 0)
 			{
+				FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 236);
 				var delimiterCounts = new Dictionary<string, int>();
 				foreach (var delimiter in config.DetectDelimiterValues)
 				{
+					FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 240);
 					// Escape regex special chars to use as regex pattern.
 					var pattern = Regex.Replace(delimiter, @"([.$^{\[(|)*+?\\])", "\\$1");
 					delimiterCounts[delimiter] = Regex.Matches(line, pattern).Count;
 				}
-
+				FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 245);
 				lineDelimiterCounts.Add(delimiterCounts);
 			}
 
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 249);
 			text = match.Success ? text.Substring(match.Index + match.Length) : string.Empty;
 		}
 
 		if (lineDelimiterCounts.Count > 1)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 255);
 			// The last line isn't complete and can't be used to reliably detect a delimiter.
 			lineDelimiterCounts.Remove(lineDelimiterCounts.Last());
 		}
 
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 260);
 		// Rank only the delimiters that appear on every line.
 		var delimiters =
 		(
@@ -247,23 +274,28 @@ public static class ConfigurationFunctions
 			}
 		).ToList();
 
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 277);
 		string? newDelimiter = null;
 		if (delimiters.Any(x => x.Delimiter == config.CultureInfo.TextInfo.ListSeparator) && lineDelimiterCounts.Count > 1)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 281);
 			// The culture's separator is on every line. Assume this is the delimiter.
 			newDelimiter = config.CultureInfo.TextInfo.ListSeparator;
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 287);
 			// Choose the highest ranked delimiter.
 			newDelimiter = delimiters.Select(x => x.Delimiter).FirstOrDefault();
 		}
 
 		if (newDelimiter != null)
 		{
+			FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 294);
 			config.Validate();
 		}
 
+		FuzzingLogsCollector.Log("ConfigurationFunctions", "GetDelimiter", 298);
 		return newDelimiter ?? config.Delimiter;
 	}
 }

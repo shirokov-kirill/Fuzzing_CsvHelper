@@ -7,6 +7,7 @@ using CsvHelper.Configuration.Attributes;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper;
 
@@ -24,12 +25,15 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static PropertyInfo GetDeclaringProperty(Type type, PropertyInfo property, BindingFlags flags)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringProperty", 28);
 		if (property.DeclaringType != type)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringProperty", 31);
 			var declaringProperty = property.DeclaringType!.GetProperty(property.Name, flags)!;
 			return GetDeclaringProperty(property.DeclaringType, declaringProperty, flags);
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringProperty", 36);
 		return property;
 	}
 
@@ -42,12 +46,15 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static FieldInfo GetDeclaringField(Type type, FieldInfo field, BindingFlags flags)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringField", 49);
 		if (field.DeclaringType != type)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringField", 52);
 			var declaringField = field.DeclaringType!.GetField(field.Name, flags)!;
 			return GetDeclaringField(field.DeclaringType, declaringField, flags);
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetDeclaringField", 57);
 		return field;
 	}
 
@@ -61,6 +68,7 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static List<PropertyInfo> GetUniqueProperties(Type type, BindingFlags flags, bool overwrite = false)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 71);
 		var ignoreBase = type.GetCustomAttribute(typeof(IgnoreBaseAttribute)) != null;
 
 		var properties = new Dictionary<string, PropertyInfo>();
@@ -69,23 +77,28 @@ internal static class ReflectionHelper
 		var currentType = type;
 		while (currentType != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 80);
 			var currentProperties = currentType.GetProperties(flags);
 			foreach (var property in currentProperties)
 			{
+				FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 84);
 				if (!properties.ContainsKey(property.Name) || overwrite)
 				{
+					FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 87);
 					properties[property.Name] = property;
 				}
 			}
 
 			if (ignoreBase)
 			{
+				FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 94);
 				break;
 			}
 
 			currentType = currentType.BaseType;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueProperties", 101);
 		return properties.Values.ToList();
 	}
 
@@ -99,6 +112,7 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static List<FieldInfo> GetUniqueFields(Type type, BindingFlags flags, bool overwrite = false)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 115);
 		var ignoreBase = type.GetCustomAttribute(typeof(IgnoreBaseAttribute)) != null;
 
 		var fields = new Dictionary<string, FieldInfo>();
@@ -107,23 +121,28 @@ internal static class ReflectionHelper
 		var currentType = type;
 		while (currentType != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 124);
 			var currentFields = currentType.GetFields(flags);
 			foreach (var field in currentFields)
 			{
+				FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 128);
 				if (!fields.ContainsKey(field.Name) || overwrite)
 				{
+					FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 131);
 					fields[field.Name] = field;
 				}
 			}
 
 			if (ignoreBase)
 			{
+				FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 138);
 				break;
 			}
 
 			currentType = currentType.BaseType;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetUniqueFields", 145);
 		return fields.Values.ToList();
 	}
 
@@ -137,19 +156,23 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static MemberInfo GetMember<TModel, TProperty>(Expression<Func<TModel, TProperty>> expression)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 159);
 		var member = GetMemberExpression(expression.Body)?.Member;
 		var property = member as PropertyInfo;
 		if (property != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 164);
 			return property;
 		}
 
 		var field = member as FieldInfo;
 		if (field != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 171);
 			return field;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 175);
 		throw new ConfigurationException($"'{member?.Name}' is not a member.");
 	}
 
@@ -163,14 +186,17 @@ internal static class ReflectionHelper
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Stack<MemberInfo> GetMembers<TModel, TProperty>(Expression<Func<TModel, TProperty?>> expression)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMembers<TModel, TProperty>", 189);
 		var stack = new Stack<MemberInfo>();
 
 		var currentExpression = expression.Body!;
 		while (true)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 195);
 			var memberExpression = GetMemberExpression(currentExpression);
 			if (memberExpression == null)
 			{
+				FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 199);
 				break;
 			}
 
@@ -178,23 +204,28 @@ internal static class ReflectionHelper
 			currentExpression = memberExpression.Expression!;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMember<TModel, TProperty>", 207);
 		return stack;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private static MemberExpression? GetMemberExpression(Expression expression)
 	{
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMemberExpression", 214);
 		MemberExpression? memberExpression = null;
 		if (expression.NodeType == ExpressionType.Convert)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetMemberExpression", 218);
 			var body = (UnaryExpression)expression;
 			memberExpression = body.Operand as MemberExpression;
 		}
 		else if (expression.NodeType == ExpressionType.MemberAccess)
 		{
+			FuzzingLogsCollector.Log("ReflectionHelper", "GetMemberExpression", 224);
 			memberExpression = expression as MemberExpression;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionHelper", "GetMemberExpression", 228);
 		return memberExpression;
 	}
 }

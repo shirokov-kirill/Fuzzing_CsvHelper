@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper;
 
 /// <summary>
@@ -28,6 +31,7 @@ public class BadDataException : CsvHelperException
 	/// <param name="context">The reading context.</param>
 	public BadDataException(string field, string rawRecord, CsvContext context) : base(context)
 	{
+		FuzzingLogsCollector.Log("BadDataException", "BadDataException", 31);
 		Field = field;
 		RawRecord = rawRecord;
 	}
@@ -42,13 +46,14 @@ public class BadDataException : CsvHelperException
 	/// <param name="message">The message that describes the error.</param>
 	public BadDataException(string field, string rawRecord, CsvContext context, string message) : base(context, message)
 	{
+		FuzzingLogsCollector.Log("BadDataException", "BadDataException", 49);
 		Field = field;
 		RawRecord = rawRecord;
 	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="BadDataException"/> class
-	/// with a specified error message and a reference to the inner exception that 
+	/// with a specified error message and a reference to the inner exception that
 	/// is the cause of this exception.
 	/// </summary>
 	/// <param name="field">The full field unedited.</param>
@@ -58,6 +63,7 @@ public class BadDataException : CsvHelperException
 	/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 	public BadDataException(string field, string rawRecord, CsvContext context, string message, Exception innerException) : base(context, message, innerException)
 	{
+		FuzzingLogsCollector.Log("BadDataException", "BadDataException", 66);
 		Field = field;
 		RawRecord = rawRecord;
 	}

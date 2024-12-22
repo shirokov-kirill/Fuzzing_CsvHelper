@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,13 +22,16 @@ public class SByteConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("SByteConverter", "ConvertFromString", 25);
 		var numberStyle = memberMapData.TypeConverterOptions.NumberStyles ?? NumberStyles.Integer;
 
 		if (sbyte.TryParse(text, numberStyle, memberMapData.TypeConverterOptions.CultureInfo, out var sb))
 		{
+			FuzzingLogsCollector.Log("SByteConverter", "ConvertFromString", 30);
 			return sb;
 		}
 
+		FuzzingLogsCollector.Log("SByteConverter", "ConvertFromString", 34);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

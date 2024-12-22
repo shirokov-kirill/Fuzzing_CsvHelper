@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -27,6 +28,7 @@ public abstract class ClassMap<TClass> : ClassMap
 	/// <returns>The member mapping.</returns>
 	public virtual MemberMap<TClass, TMember> Map<TMember>(Expression<Func<TClass, TMember?>> expression, bool useExistingMap = true)
 	{
+		FuzzingLogsCollector.Log("ClassMap'1", "Map", 31);
 		var (classMap, member) = GetMemberMap(expression);
 		var memberMap = classMap.Map(typeof(TClass), member, useExistingMap); ;
 
@@ -42,6 +44,7 @@ public abstract class ClassMap<TClass> : ClassMap
 	/// <returns>The member mapping.</returns>
 	public virtual MemberMap Map<T>(Expression<Func<T, object?>> expression, bool useExistingMap = true)
 	{
+		FuzzingLogsCollector.Log("ClassMap'1", "Map", 47);
 		var (classMap, member) = GetMemberMap(expression);
 		var memberMap = classMap.Map(typeof(TClass), member, useExistingMap);
 
@@ -49,7 +52,7 @@ public abstract class ClassMap<TClass> : ClassMap
 	}
 
 	/// <summary>
-	/// Meant for internal use only. 
+	/// Meant for internal use only.
 	/// Maps a member to another class map. When this is used, accessing a property through
 	/// sub-property mapping later won't work. You can only use one or the other. When using
 	/// this, ConvertUsing will also not work.
@@ -60,15 +63,18 @@ public abstract class ClassMap<TClass> : ClassMap
 	/// <returns>The reference mapping for the member.</returns>
 	public virtual MemberReferenceMap References<TClassMap>(Expression<Func<TClass, object?>> expression, params object[] constructorArgs) where TClassMap : ClassMap
 	{
+		FuzzingLogsCollector.Log("ClassMap'1", "References", 66);
 		var member = ReflectionHelper.GetMember(expression);
 		return References(typeof(TClassMap), member, constructorArgs);
 	}
 
 	private (ClassMap, MemberInfo) GetMemberMap<TModel, TProperty>(Expression<Func<TModel, TProperty?>> expression)
 	{
+		FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 73);
 		var stack = ReflectionHelper.GetMembers(expression);
 		if (stack.Count == 0)
 		{
+			FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 77);
 			throw new InvalidOperationException($"No members were found in expression '{expression}'.");
 		}
 
@@ -77,23 +83,28 @@ public abstract class ClassMap<TClass> : ClassMap
 
 		if (stack.Count > 1)
 		{
+			FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 86);
 			// We need to add a reference map for every sub member.
 			while (stack.Count > 1)
 			{
+				FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 90);
 				member = stack.Pop();
 				Type mapType;
 				var property = member as PropertyInfo;
 				var field = member as FieldInfo;
 				if (property != null)
 				{
+					FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 97);
 					mapType = typeof(DefaultClassMap<>).MakeGenericType(property.PropertyType);
 				}
 				else if (field != null)
 				{
+					FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 102);
 					mapType = typeof(DefaultClassMap<>).MakeGenericType(field.FieldType);
 				}
 				else
 				{
+					FuzzingLogsCollector.Log("ClassMap'1", "GetMemberMap", 107);
 					throw new InvalidOperationException("The given expression was not a property or a field.");
 				}
 

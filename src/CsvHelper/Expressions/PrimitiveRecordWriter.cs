@@ -5,6 +5,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System.Linq.Expressions;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -27,6 +28,7 @@ public class PrimitiveRecordWriter : RecordWriter
 	/// <param name="type">The type for the record.</param>
 	protected override Action<T> CreateWriteDelegate<T>(Type type)
 	{
+		FuzzingLogsCollector.Log("PrimitiveRecordWriter", "CreateWriteDelegate<T>", 31);
 		var recordParameter = Expression.Parameter(typeof(T), "record");
 
 		Expression fieldExpression = Expression.Convert(recordParameter, typeof(object));
@@ -48,6 +50,7 @@ public class PrimitiveRecordWriter : RecordWriter
 
 		var action = Expression.Lambda<Action<T>>(fieldExpression, recordParameter).Compile();
 
+		FuzzingLogsCollector.Log("PrimitiveRecordWriter", "CreateWriteDelegate<T>", 53);
 		return action;
 	}
 }

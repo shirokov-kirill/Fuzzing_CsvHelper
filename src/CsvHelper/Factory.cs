@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper;
 
@@ -20,6 +21,7 @@ public class Factory : IFactory
 	/// <returns>The created parser.</returns>
 	public virtual IParser CreateParser(TextReader reader, Configuration.CsvConfiguration configuration)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateParser", 24);
 		return new CsvParser(reader, configuration);
 	}
 
@@ -33,6 +35,7 @@ public class Factory : IFactory
 	/// </returns>
 	public virtual IParser CreateParser(TextReader reader, CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateParser", 38);
 		return new CsvParser(reader, cultureInfo);
 	}
 
@@ -44,6 +47,7 @@ public class Factory : IFactory
 	/// <returns>The created reader.</returns>
 	public virtual IReader CreateReader(TextReader reader, Configuration.CsvConfiguration configuration)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateReader", 50);
 		return new CsvReader(reader, configuration);
 	}
 
@@ -57,6 +61,7 @@ public class Factory : IFactory
 	/// </returns>
 	public virtual IReader CreateReader(TextReader reader, CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateReader", 64);
 		return new CsvReader(reader, cultureInfo);
 	}
 
@@ -67,6 +72,7 @@ public class Factory : IFactory
 	/// <returns>The created reader.</returns>
 	public virtual IReader CreateReader(IParser parser)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateReader", 75);
 		return new CsvReader(parser);
 	}
 
@@ -78,6 +84,7 @@ public class Factory : IFactory
 	/// <returns>The created writer.</returns>
 	public virtual IWriter CreateWriter(TextWriter writer, Configuration.CsvConfiguration configuration)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateWriter", 87);
 		return new CsvWriter(writer, configuration);
 	}
 
@@ -91,6 +98,7 @@ public class Factory : IFactory
 	/// </returns>
 	public virtual IWriter CreateWriter(TextWriter writer, CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateWriter", 101);
 		return new CsvWriter(writer, cultureInfo);
 	}
 
@@ -101,6 +109,7 @@ public class Factory : IFactory
 	/// <returns>Options to further configure the <see cref="ClassMap{T}"/></returns>
 	public IHasMap<T> CreateClassMapBuilder<T>()
 	{
+		FuzzingLogsCollector.Log("Factory", "CreateClassMapBuilder<T>", 112);
 		return new ClassMapBuilder<T>();
 	}
 }

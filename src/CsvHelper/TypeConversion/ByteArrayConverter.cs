@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Text;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -22,6 +23,7 @@ public class ByteArrayConverter : DefaultTypeConverter
 	/// <param name="options">The options.</param>
 	public ByteArrayConverter(ByteArrayConverterOptions options = ByteArrayConverterOptions.Hexadecimal | ByteArrayConverterOptions.HexInclude0x)
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayConverter", 26);
 		// Defaults to the literal format used by C# for whole numbers, and SQL Server for binary data.
 		this.options = options;
 		ValidateOptions();
@@ -39,13 +41,16 @@ public class ByteArrayConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertToString", 44);
 		if (value is byte[] byteArray)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertToString", 47);
 			return (options & ByteArrayConverterOptions.Base64) == ByteArrayConverterOptions.Base64
 				? Convert.ToBase64String(byteArray)
 				: ByteArrayToHexString(byteArray);
 		}
 
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertToString", 53);
 		return base.ConvertToString(value, row, memberMapData);
 	}
 
@@ -58,40 +63,49 @@ public class ByteArrayConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertFromString", 66);
 		if (text != null)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertToString", 69);
 			return (options & ByteArrayConverterOptions.Base64) == ByteArrayConverterOptions.Base64
 				? Convert.FromBase64String(text)
 				: HexStringToByteArray(text);
 		}
 
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ConvertToString", 75);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 
 	private string ByteArrayToHexString(byte[] byteArray)
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayToHexString", 81);
 		var hexString = new StringBuilder();
 
 		if ((options & ByteArrayConverterOptions.HexInclude0x) == ByteArrayConverterOptions.HexInclude0x)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayToHexString", 86);
 			hexString.Append("0x");
 		}
 
 		if (byteArray.Length >= 1)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayToHexString", 92);
 			hexString.Append(byteArray[0].ToString("X2"));
 		}
 
 		for (var i = 1; i < byteArray.Length; i++)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayToHexString", 98);
 			hexString.Append(HexStringPrefix + byteArray[i].ToString("X2"));
 		}
 
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ByteArrayToHexString", 102);
 		return hexString.ToString();
 	}
 
 	private byte[] HexStringToByteArray(string hex)
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "HexStringToByteArray", 108);
 		var has0x = hex.StartsWith("0x");
 
 		var length = has0x
@@ -102,23 +116,29 @@ public class ByteArrayConverter : DefaultTypeConverter
 
 		for (var stringIndex = has0xOffset * 2; stringIndex < hex.Length; stringIndex += ByteLength)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "HexStringToByteArray", 119);
 			byteArray[(stringIndex - has0xOffset) / ByteLength] = Convert.ToByte(hex.Substring(stringIndex, 2), 16);
 		}
 
+		FuzzingLogsCollector.Log("ByteArrayConverter", "HexStringToByteArray", 123);
 		return byteArray;
 	}
 
 	private void ValidateOptions()
 	{
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ValidateOptions", 129);
 		if ((options & ByteArrayConverterOptions.Base64) == ByteArrayConverterOptions.Base64)
 		{
+			FuzzingLogsCollector.Log("ByteArrayConverter", "ValidateOptions", 132);
 			if ((options & (ByteArrayConverterOptions.HexInclude0x | ByteArrayConverterOptions.HexDashes | ByteArrayConverterOptions.Hexadecimal)) != ByteArrayConverterOptions.None)
 			{
+				FuzzingLogsCollector.Log("ByteArrayConverter", "ValidateOptions", 135);
 				throw new ConfigurationException($"{nameof(ByteArrayConverter)} must be configured exclusively with HexDecimal options, or exclusively with Base64 options.  Was {options.ToString()}")
 				{
 					Data = { { "options", options } }
 				};
 			}
 		}
+		FuzzingLogsCollector.Log("ByteArrayConverter", "ValidateOptions", 142);
 	}
 }

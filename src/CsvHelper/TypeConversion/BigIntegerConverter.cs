@@ -5,6 +5,7 @@
 using CsvHelper.Configuration;
 using System.Globalization;
 using System.Numerics;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -22,11 +23,14 @@ public class BigIntegerConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertToString", 26);
 		if (value is BigInteger bi && memberMapData.TypeConverterOptions.Formats?.FirstOrDefault() == null)
 		{
+			FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertToString", 29);
 			return bi.ToString("R", memberMapData.TypeConverterOptions.CultureInfo);
 		}
 
+		FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertToString", 33);
 		return base.ConvertToString(value, row, memberMapData);
 	}
 
@@ -39,13 +43,16 @@ public class BigIntegerConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertFromString", 46);
 		var numberStyle = memberMapData.TypeConverterOptions.NumberStyles ?? NumberStyles.Integer;
 
 		if (BigInteger.TryParse(text, numberStyle, memberMapData.TypeConverterOptions.CultureInfo, out var bi))
 		{
+			FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertFromString", 51);
 			return bi;
 		}
 
+		FuzzingLogsCollector.Log("BigIntegerConverter", "ConvertFromString", 55);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

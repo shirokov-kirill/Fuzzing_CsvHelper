@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,6 +22,7 @@ public class IEnumerableGenericConverter : IEnumerableConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 25);
 		var type = memberMapData.Member!.MemberType().GetGenericArguments()[0];
 		var listType = typeof(List<>);
 		listType = listType.MakeGenericType(type);
@@ -29,12 +31,15 @@ public class IEnumerableGenericConverter : IEnumerableConverter
 
 		if (memberMapData.IsNameSet || row.Configuration.HasHeaderRecord && !memberMapData.IsIndexSet)
 		{
+			FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 34);
 			// Use the name.
 			var nameIndex = 0;
 			while (true)
 			{
+				FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 39);
 				if (!row.TryGetField(type, memberMapData.Names.FirstOrDefault()!, nameIndex, out var field))
 				{
+					FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 42);
 					break;
 				}
 
@@ -44,6 +49,7 @@ public class IEnumerableGenericConverter : IEnumerableConverter
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 52);
 			// Use the index.
 			var indexEnd = memberMapData.IndexEnd < memberMapData.Index
 				? row.Parser.Count - 1
@@ -51,12 +57,14 @@ public class IEnumerableGenericConverter : IEnumerableConverter
 
 			for (var i = memberMapData.Index; i <= indexEnd; i++)
 			{
+				FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 60);
 				var field = converter.ConvertFromString(row.GetField(i), row, memberMapData);
 
 				list.Add(field);
 			}
 		}
 
+		FuzzingLogsCollector.Log("IEnumerableGenericConverter", "ConvertFromString", 67);
 		return list;
 	}
 }

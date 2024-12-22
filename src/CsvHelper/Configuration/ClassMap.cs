@@ -8,6 +8,7 @@ using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -53,6 +54,7 @@ public abstract class ClassMap
 	/// <param name="classType">The type of the class this map is for.</param>
 	internal ClassMap(Type classType)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ClassMap", 57);
 		ClassType = classType;
 	}
 
@@ -67,15 +69,18 @@ public abstract class ClassMap
 	/// <returns>The member mapping.</returns>
 	public MemberMap Map(Type classType, MemberInfo member, bool useExistingMap = true)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "Map", 72);
 		if (useExistingMap)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "Map", 75);
 			var existingMap = MemberMaps.Find(member);
 			if (existingMap != null)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "Map", 79);
 				return existingMap;
 			}
 		}
-
+		FuzzingLogsCollector.Log("ClassMap", "Map", 83);
 		var memberMap = MemberMap.CreateGeneric(classType, member);
 		memberMap.Data.Index = GetMaxIndex() + 1;
 		MemberMaps.Add(memberMap);
@@ -90,6 +95,7 @@ public abstract class ClassMap
 	/// <returns>The member mapping.</returns>
 	public virtual MemberMap<object, object> Map()
 	{
+		FuzzingLogsCollector.Log("ClassMap", "Map", 98);
 		var memberMap = new MemberMap<object, object>(null);
 		memberMap.Data.Index = GetMaxIndex() + 1;
 		MemberMaps.Add(memberMap);
@@ -106,18 +112,23 @@ public abstract class ClassMap
 	/// <returns>The reference mapping for the member.</returns>
 	public virtual MemberReferenceMap References(Type classMapType, MemberInfo member, params object[] constructorArgs)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "References", 115);
 		if (!typeof(ClassMap).IsAssignableFrom(classMapType))
 		{
+			FuzzingLogsCollector.Log("ClassMap", "References", 118);
 			throw new InvalidOperationException($"Argument {nameof(classMapType)} is not a CsvClassMap.");
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "References", 122);
 		var existingMap = ReferenceMaps.Find(member);
 
 		if (existingMap != null)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "References", 127);
 			return existingMap;
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "References", 131);
 		var map = (ClassMap)ObjectResolver.Current.Resolve(classMapType, constructorArgs);
 		map.ReIndex(GetMaxIndex() + 1);
 		var reference = new MemberReferenceMap(member, map);
@@ -132,8 +143,12 @@ public abstract class ClassMap
 	/// <param name="name">The name of the constructor parameter.</param>
 	public virtual ParameterMap Parameter(string name)
 	{
-		if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
-
+		if (string.IsNullOrWhiteSpace(name))
+		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 148);
+			throw new ArgumentNullException(nameof(name));
+		}
+		FuzzingLogsCollector.Log("ClassMap", "Parameter", 151);
 		var args = new GetConstructorArgs(ClassType);
 
 		return Parameter(() => ConfigurationFunctions.GetConstructor(args), name);
@@ -146,17 +161,29 @@ public abstract class ClassMap
 	/// <param name="name">The name of the constructor parameter.</param>
 	public virtual ParameterMap Parameter(Func<ConstructorInfo> getConstructor, string name)
 	{
-		if (getConstructor == null) throw new ArgumentNullException(nameof(getConstructor));
-		if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+		if (getConstructor == null)
+		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 166);
+			throw new ArgumentNullException(nameof(getConstructor));
+		}
 
+		if (string.IsNullOrWhiteSpace(name))
+		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 172);
+			throw new ArgumentNullException(nameof(name));
+		}
+
+		FuzzingLogsCollector.Log("ClassMap", "Parameter", 176);
 		var constructor = getConstructor();
 		var parameters = constructor.GetParameters();
 		var parameter = parameters.SingleOrDefault(p => p.Name == name);
 		if (parameter == null)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 182);
 			throw new ConfigurationException($"Constructor {constructor.GetDefinition()} doesn't contain a paramter with name '{name}'.");
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "Parameter", 186);
 		return Parameter(constructor, parameter);
 	}
 
@@ -167,14 +194,25 @@ public abstract class ClassMap
 	/// <param name="parameter">The <see cref="ParameterInfo"/> for the constructor parameter.</param>
 	public virtual ParameterMap Parameter(ConstructorInfo constructor, ParameterInfo parameter)
 	{
-		if (constructor == null) throw new ArgumentNullException(nameof(constructor));
-		if (parameter == null) throw new ArgumentNullException(nameof(parameter));
+		if (constructor == null)
+		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 199);
+			throw new ArgumentNullException(nameof(constructor));
+		}
+
+		if (parameter == null)
+		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 205);
+			throw new ArgumentNullException(nameof(parameter));
+		}
 
 		if (!constructor.GetParameters().Contains(parameter))
 		{
+			FuzzingLogsCollector.Log("ClassMap", "Parameter", 211);
 			throw new ConfigurationException($"Constructor {constructor.GetDefinition()} doesn't contain parameter '{parameter.GetDefinition()}'.");
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "Parameter", 215);
 		var parameterMap = new ParameterMap(parameter);
 		parameterMap.Data.Index = GetMaxIndex(isParameter: true) + 1;
 		ParameterMaps.Add(parameterMap);
@@ -193,7 +231,7 @@ public abstract class ClassMap
 	}
 
 	/// <summary>
-	/// Auto maps all members for the given type. If a member 
+	/// Auto maps all members for the given type. If a member
 	/// is mapped again it will override the existing map.
 	/// </summary>
 	/// <param name="configuration">The configuration.</param>
@@ -203,32 +241,36 @@ public abstract class ClassMap
 	}
 
 	/// <summary>
-	/// Auto maps all members for the given type. If a member 
+	/// Auto maps all members for the given type. If a member
 	/// is mapped again it will override the existing map.
 	/// </summary>
 	/// <param name="context">The context.</param>
 	public virtual void AutoMap(CsvContext context)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "AutoMap", 250);
 		var type = GetGenericType();
 		if (typeof(IEnumerable).IsAssignableFrom(type))
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMap", 254);
 			throw new ConfigurationException("Types that inherit IEnumerable cannot be auto mapped. " +
 											 "Did you accidentally call GetRecord or WriteRecord which " +
 											 "acts on a single record instead of calling GetRecords or " +
 											 "WriteRecords which acts on a list of records?");
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "AutoMap", 261);
 		var mapParents = new LinkedList<Type>();
 		var args = new ShouldUseConstructorParametersArgs(type);
 		if (context.Configuration.ShouldUseConstructorParameters(args))
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMap", 266);
 			// This type doesn't have a parameterless constructor so we can't create an
 			// instance and set it's member. Constructor parameters need to be created
 			// instead. Writing only uses getters, so members will also be mapped
 			// for writing purposes.
 			AutoMapConstructorParameters(this, context, mapParents);
 		}
-
+		FuzzingLogsCollector.Log("ClassMap", "AutoMap", 273);
 		AutoMapMembers(this, context, mapParents);
 	}
 
@@ -241,25 +283,31 @@ public abstract class ClassMap
 	{
 		if (isParameter)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 286);
 			return ParameterMaps.Select(parameterMap => parameterMap.GetMaxIndex()).DefaultIfEmpty(-1).Max();
 		}
 
 		if (MemberMaps.Count == 0 && ReferenceMaps.Count == 0)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 292);
 			return -1;
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 296);
 		var indexes = new List<int>();
 		if (MemberMaps.Count > 0)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 300);
 			indexes.Add(MemberMaps.Max(pm => pm.Data.Index));
 		}
 
 		if (ReferenceMaps.Count > 0)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 306);
 			indexes.AddRange(ReferenceMaps.Select(referenceMap => referenceMap.GetMaxIndex()));
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "GetMaxIndex", 310);
 		return indexes.Max();
 	}
 
@@ -270,21 +318,26 @@ public abstract class ClassMap
 	/// <returns>The last index + 1.</returns>
 	public virtual int ReIndex(int indexStart = 0)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ReIndex", 321);
 		foreach (var parameterMap in ParameterMaps)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ReIndex", 324);
 			parameterMap.Data.Index = indexStart + parameterMap.Data.Index;
 		}
 
 		foreach (var memberMap in MemberMaps)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ReIndex", 330);
 			if (!memberMap.Data.IsIndexSet)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "ReIndex", 333);
 				memberMap.Data.Index = indexStart + memberMap.Data.Index;
 			}
 		}
 
 		foreach (var referenceMap in ReferenceMaps)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ReIndex", 340);
 			indexStart = referenceMap.Data.Mapping.ReIndex(indexStart);
 		}
 
@@ -300,65 +353,76 @@ public abstract class ClassMap
 	/// <param name="indexStart">The index starting point.</param>
 	protected virtual void AutoMapMembers(ClassMap map, CsvContext context, LinkedList<Type> mapParents, int indexStart = 0)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 356);
 		var type = map.GetGenericType();
 
 		var flags = BindingFlags.Instance | BindingFlags.Public;
 		if (context.Configuration.IncludePrivateMembers)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 362);
 			flags = flags | BindingFlags.NonPublic;
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 366);
 		var members = new List<MemberInfo>();
 		if ((context.Configuration.MemberTypes & MemberTypes.Properties) == MemberTypes.Properties)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 370);
 			// We need to go up the declaration tree and find the actual type the property
 			// exists on and use that PropertyInfo instead. This is so we can get the private
 			// set method for the property.
 			var properties = new List<PropertyInfo>();
 			foreach (var property in ReflectionHelper.GetUniqueProperties(type, flags))
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 377);
 				if (properties.Any(p => p.Name == property.Name))
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 380);
 					// Multiple properties could have the same name if a child class property
 					// is hiding a parent class property by using `new`. It's possible that
-					// the order of the properties returned 
+					// the order of the properties returned
 					continue;
 				}
-
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 386);
 				properties.Add(ReflectionHelper.GetDeclaringProperty(type, property, flags));
 			}
-
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 389);
 			members.AddRange(properties);
 		}
 
 		if ((context.Configuration.MemberTypes & MemberTypes.Fields) == MemberTypes.Fields)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 395);
 			// We need to go up the declaration tree and find the actual type the field
 			// exists on and use that FieldInfo instead.
 			var fields = new List<MemberInfo>();
 			foreach (var field in ReflectionHelper.GetUniqueFields(type, flags))
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 401);
 				if (fields.Any(p => p.Name == field.Name))
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 404);
 					// Multiple fields could have the same name if a child class field
 					// is hiding a parent class field by using `new`. It's possible that
-					// the order of the fields returned 
+					// the order of the fields returned
 					continue;
 				}
 
 				if (!field.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Any())
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 413);
 					fields.Add(ReflectionHelper.GetDeclaringField(type, field, flags));
 				}
 			}
-
 			members.AddRange(fields);
 		}
 
 		foreach (var member in members)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 422);
 			if (member.GetCustomAttribute<IgnoreAttribute>() != null)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 425);
 				// Ignore this member including its tree if it's a reference.
 				continue;
 			}
@@ -367,6 +431,7 @@ public abstract class ClassMap
 
 			if (context.Configuration.HasHeaderRecord && enumerableConverters.Contains(typeConverterType))
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 434);
 				// Enumerable converters can't write the header properly, so skip it.
 				continue;
 			}
@@ -375,17 +440,20 @@ public abstract class ClassMap
 			var isDefaultConverter = typeConverterType == typeof(DefaultTypeConverter);
 			if (isDefaultConverter)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 443);
 				// If the type is not one covered by our type converters
 				// and it has a parameterless constructor, create a
 				// reference map for it.
 
 				if (context.Configuration.IgnoreReferences)
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 450);
 					continue;
 				}
 
 				if (CheckForCircularReference(member.MemberType(), mapParents))
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 456);
 					continue;
 				}
 
@@ -395,6 +463,7 @@ public abstract class ClassMap
 
 				if (memberTypeInfo.HasConstructor() && !memberTypeInfo.HasParameterlessConstructor() && !memberTypeInfo.IsUserDefinedStruct())
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 466);
 					AutoMapConstructorParameters(refMap, context, mapParents, Math.Max(map.GetMaxIndex() + 1, indexStart));
 				}
 
@@ -404,9 +473,11 @@ public abstract class ClassMap
 
 				if (refMap.MemberMaps.Count > 0 || refMap.ReferenceMaps.Count > 0)
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 476);
 					var referenceMap = new MemberReferenceMap(member, refMap);
 					if (context.Configuration.ReferenceHeaderPrefix != null)
 					{
+						FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 480);
 						var args = new ReferenceHeaderPrefixArgs(member.MemberType(), member.Name);
 						referenceMap.Data.Prefix = context.Configuration.ReferenceHeaderPrefix(args);
 					}
@@ -418,6 +489,7 @@ public abstract class ClassMap
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 492);
 				// Only add the member map if it can be converted later on.
 				// If the member will use the default converter, don't add it because
 				// we don't want the .ToString() value to be used when auto mapping.
@@ -437,7 +509,7 @@ public abstract class ClassMap
 				map.MemberMaps.Add(memberMap);
 			}
 		}
-
+		FuzzingLogsCollector.Log("ClassMap", "AutoMapMembers", 512);
 		map.ReIndex(indexStart);
 	}
 
@@ -450,6 +522,7 @@ public abstract class ClassMap
 	/// <param name="indexStart">The index starting point.</param>
 	protected virtual void AutoMapConstructorParameters(ClassMap map, CsvContext context, LinkedList<Type> mapParents, int indexStart = 0)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 525);
 		var type = map.GetGenericType();
 		var args = new GetConstructorArgs(map.ClassType);
 		var constructor = context.Configuration.GetConstructor(args);
@@ -457,10 +530,12 @@ public abstract class ClassMap
 
 		foreach (var parameter in parameters)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 533);
 			var parameterMap = new ParameterMap(parameter);
 
 			if (parameter.GetCustomAttributes<IgnoreAttribute>(true).Any() || parameter.GetCustomAttributes<ConstantAttribute>(true).Any())
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 538);
 				// If there is an IgnoreAttribute or ConstantAttribute, we still need to add a map because a constructor requires
 				// all parameters to be present. A default value will be used later on.
 
@@ -474,12 +549,14 @@ public abstract class ClassMap
 			var isDefaultConverter = typeConverterType == typeof(DefaultTypeConverter);
 			if (isDefaultConverter && (memberTypeInfo.HasParameterlessConstructor() || memberTypeInfo.IsUserDefinedStruct()))
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 552);
 				// If the type is not one covered by our type converters
 				// and it has a parameterless constructor, create a
 				// reference map for it.
 
 				if (context.Configuration.IgnoreReferences)
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 559);
 					throw new InvalidOperationException($"Configuration '{nameof(CsvConfiguration.IgnoreReferences)}' can't be true " +
 														  "when using types without a default constructor. Constructor parameters " +
 														  "are used and all members including references must be used.");
@@ -487,6 +564,7 @@ public abstract class ClassMap
 
 				if (CheckForCircularReference(parameter.ParameterType, mapParents))
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 567);
 					throw new InvalidOperationException($"A circular reference was detected in constructor paramter '{parameter.Name}'." +
 														  "Since all parameters must be supplied for a constructor, this parameter can't be skipped.");
 				}
@@ -500,6 +578,7 @@ public abstract class ClassMap
 				var referenceMap = new ParameterReferenceMap(parameter, refMap);
 				if (context.Configuration.ReferenceHeaderPrefix != null)
 				{
+					FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 581);
 					var referenceHeaderPrefix = new ReferenceHeaderPrefixArgs(memberTypeInfo.MemberType(), memberTypeInfo.Name);
 					referenceMap.Data.Prefix = context.Configuration.ReferenceHeaderPrefix(referenceHeaderPrefix);
 				}
@@ -510,6 +589,7 @@ public abstract class ClassMap
 			}
 			else if (isDefaultConverter && context.Configuration.ShouldUseConstructorParameters(new ShouldUseConstructorParametersArgs(parameter.ParameterType)))
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 592);
 				// If the type is not one covered by our type converters
 				// and it should use contructor parameters, create a
 				// constructor map for it.
@@ -525,15 +605,17 @@ public abstract class ClassMap
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 608);
 				parameterMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions(), context.TypeConverterOptionsCache.GetOptions(parameter.ParameterType), parameterMap.Data.TypeConverterOptions);
 				parameterMap.Data.Index = map.GetMaxIndex(isParameter: true) + 1;
 
 				ApplyAttributes(parameterMap);
 			}
 
+			FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 615);
 			map.ParameterMaps.Add(parameterMap);
 		}
-
+		FuzzingLogsCollector.Log("ClassMap", "AutoMapConstructorParameters", 618);
 		map.ReIndex(indexStart);
 	}
 
@@ -546,22 +628,27 @@ public abstract class ClassMap
 	/// True if a circular reference was found, otherwise false.</returns>
 	protected virtual bool CheckForCircularReference(Type type, LinkedList<Type> mapParents)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "CheckForCircularReference", 631);
 		if (mapParents.Count == 0)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "CheckForCircularReference", 634);
 			return false;
 		}
 
 		var node = mapParents.Last;
 		while (true)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "CheckForCircularReference", 641);
 			if (node?.Value == type)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "CheckForCircularReference", 644);
 				return true;
 			}
 
 			node = node?.Previous;
 			if (node == null)
 			{
+				FuzzingLogsCollector.Log("ClassMap", "CheckForCircularReference", 651);
 				break;
 			}
 		}
@@ -574,6 +661,7 @@ public abstract class ClassMap
 	/// </summary>
 	protected virtual Type GetGenericType()
 	{
+		FuzzingLogsCollector.Log("ClassMap", "GetGenericType", 664);
 		return GetType().GetTypeInfo().BaseType?.GetGenericArguments()[0] ?? throw new ConfigurationException();
 	}
 
@@ -583,11 +671,13 @@ public abstract class ClassMap
 	/// <param name="parameterMap">The parameter map.</param>
 	protected virtual void ApplyAttributes(ParameterMap parameterMap)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 674);
 		var parameter = parameterMap.Data.Parameter;
 		var attributes = parameter.GetCustomAttributes().OfType<IParameterMapper>();
 
 		foreach (var attribute in attributes)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 680);
 			attribute.ApplyTo(parameterMap);
 		}
 	}
@@ -598,11 +688,13 @@ public abstract class ClassMap
 	/// <param name="referenceMap">The parameter reference map.</param>
 	protected virtual void ApplyAttributes(ParameterReferenceMap referenceMap)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 691);
 		var parameter = referenceMap.Data.Parameter;
 		var attributes = parameter.GetCustomAttributes().OfType<IParameterReferenceMapper>();
 
 		foreach (var attribute in attributes)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 697);
 			attribute.ApplyTo(referenceMap);
 		}
 	}
@@ -613,16 +705,20 @@ public abstract class ClassMap
 	/// <param name="memberMap">The member map.</param>
 	protected virtual void ApplyAttributes(MemberMap memberMap)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 708);
 		if (memberMap.Data.Member == null)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 711);
 			return;
 		}
 
+		FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 715);
 		var member = memberMap.Data.Member;
 		var attributes = member.GetCustomAttributes().OfType<IMemberMapper>();
 
 		foreach (var attribute in attributes)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 721);
 			attribute.ApplyTo(memberMap);
 		}
 	}
@@ -633,11 +729,13 @@ public abstract class ClassMap
 	/// <param name="referenceMap">The member reference map.</param>
 	protected virtual void ApplyAttributes(MemberReferenceMap referenceMap)
 	{
+		FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 732);
 		var member = referenceMap.Data.Member;
 		var attributes = member.GetCustomAttributes().OfType<IMemberReferenceMapper>();
 
 		foreach (var attribute in attributes)
 		{
+			FuzzingLogsCollector.Log("ClassMap", "ApplyAttributes", 738);
 			attribute.ApplyTo(referenceMap);
 		}
 	}

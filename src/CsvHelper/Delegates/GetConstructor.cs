@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper;
 
@@ -27,6 +28,7 @@ public readonly struct GetConstructorArgs
 	/// <param name="classType">The class type.</param>
 	public GetConstructorArgs(Type classType)
 	{
+		FuzzingLogsCollector.Log("GetConstructorArgs", "GetConstructorArgs", 31);
 		ClassType = classType;
 	}
 }

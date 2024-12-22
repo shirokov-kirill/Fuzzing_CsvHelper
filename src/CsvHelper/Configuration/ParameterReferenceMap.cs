@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -25,8 +26,10 @@ public class ParameterReferenceMap
 	/// <param name="mapping">The <see cref="ClassMap"/> to use for the reference map.</param>
 	public ParameterReferenceMap(ParameterInfo parameter, ClassMap mapping)
 	{
+		FuzzingLogsCollector.Log("ParameterReferenceMap", "ParameterReferenceMap", 29);
 		if (mapping == null)
 		{
+			FuzzingLogsCollector.Log("ParameterReferenceMap", "ParameterReferenceMap", 32);
 			throw new ArgumentNullException(nameof(mapping));
 		}
 
@@ -41,14 +44,17 @@ public class ParameterReferenceMap
 	/// <returns>The current <see cref="ParameterReferenceMap" /></returns>
 	public ParameterReferenceMap Prefix(string? prefix = null, bool inherit = false)
 	{
+		FuzzingLogsCollector.Log("ParameterReferenceMap", "Prefix", 47);
 		if (string.IsNullOrEmpty(prefix))
 		{
+			FuzzingLogsCollector.Log("ParameterReferenceMap", "Prefix", 50);
 			prefix = data.Parameter.Name + ".";
 		}
 
 		data.Inherit = inherit;
 		data.Prefix = prefix!;
 
+		FuzzingLogsCollector.Log("ParameterReferenceMap", "Prefix", 57);
 		return this;
 	}
 
@@ -59,6 +65,7 @@ public class ParameterReferenceMap
 	/// <returns>The max index.</returns>
 	internal int GetMaxIndex()
 	{
+		FuzzingLogsCollector.Log("ParameterReferenceMap", "GetMaxIndex", 68);
 		return data.Mapping.GetMaxIndex();
 	}
 }

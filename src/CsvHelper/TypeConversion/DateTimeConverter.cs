@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,10 +22,13 @@ public class DateTimeConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("DateTimeConverter", "ConvertFromString", 25);
 		if (text == null)
 		{
+			FuzzingLogsCollector.Log("DateTimeConverter", "ConvertFromString", 28);
 			return base.ConvertFromString(null, row, memberMapData);
 		}
+		FuzzingLogsCollector.Log("DateTimeConverter", "ConvertFromString", 31);
 
 		var formatProvider = (IFormatProvider?)memberMapData.TypeConverterOptions.CultureInfo?.GetFormat(typeof(DateTimeFormatInfo)) ?? memberMapData.TypeConverterOptions.CultureInfo;
 		var dateTimeStyle = memberMapData.TypeConverterOptions.DateTimeStyle ?? DateTimeStyles.None;
@@ -34,6 +38,7 @@ public class DateTimeConverter : DefaultTypeConverter
 			? DateTime.TryParse(text, formatProvider, dateTimeStyle, out dateTime)
 			: DateTime.TryParseExact(text, memberMapData.TypeConverterOptions.Formats, formatProvider, dateTimeStyle, out dateTime);
 
+		FuzzingLogsCollector.Log("DateTimeConverter", "ConvertFromString", 41);
 		return success
 			? dateTime
 			: base.ConvertFromString(text, row, memberMapData);

@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -19,6 +20,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="memberMap">The member map the options are being applied to.</param>
 	public MemberMapTypeConverterOption(MemberMap memberMap)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "MemberMapTypeConverterOption", 22);
 		this.memberMap = memberMap;
 	}
 
@@ -30,6 +32,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="cultureInfo">The culture info.</param>
 	public virtual MemberMap CultureInfo(CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "CultureInfo", 35);
 		memberMap.Data.TypeConverterOptions.CultureInfo = cultureInfo;
 
 		return memberMap;
@@ -42,6 +45,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="dateTimeStyle">The date time style.</param>
 	public virtual MemberMap DateTimeStyles(DateTimeStyles dateTimeStyle)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "DateTimeStyles", 48);
 		memberMap.Data.TypeConverterOptions.DateTimeStyle = dateTimeStyle;
 
 		return memberMap;
@@ -54,6 +58,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="timeSpanStyles">The time span styles.</param>
 	public virtual MemberMap TimespanStyles(TimeSpanStyles timeSpanStyles)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "TimespanStyles", 61);
 		memberMap.Data.TypeConverterOptions.TimeSpanStyle = timeSpanStyles;
 
 		return memberMap;
@@ -66,6 +71,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="numberStyle"></param>
 	public virtual MemberMap NumberStyles(NumberStyles numberStyle)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "NumberStyles", 74);
 		memberMap.Data.TypeConverterOptions.NumberStyles = numberStyle;
 
 		return memberMap;
@@ -77,6 +83,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="formats">The format.</param>
 	public virtual MemberMap Format(params string[] formats)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "Format", 86);
 		memberMap.Data.TypeConverterOptions.Formats = formats;
 
 		return memberMap;
@@ -89,6 +96,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="uriKind">Kind of the URI.</param>
 	public virtual MemberMap UriKind(UriKind uriKind)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "UriKind", 99);
 		memberMap.Data.TypeConverterOptions.UriKind = uriKind;
 
 		return memberMap;
@@ -102,25 +110,31 @@ public class MemberMapTypeConverterOption
 	/// <param name="booleanValues">The string boolean values.</param>
 	public virtual MemberMap BooleanValues(bool isTrue, bool clearValues = true, params string[] booleanValues)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 113);
 		if (isTrue)
 		{
+			FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 116);
 			if (clearValues)
 			{
+				FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 119);
 				memberMap.Data.TypeConverterOptions.BooleanTrueValues.Clear();
 			}
-
+			FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 122);
 			memberMap.Data.TypeConverterOptions.BooleanTrueValues.AddRange(booleanValues);
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 127);
 			if (clearValues)
 			{
+				FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 130);
 				memberMap.Data.TypeConverterOptions.BooleanFalseValues.Clear();
 			}
 
 			memberMap.Data.TypeConverterOptions.BooleanFalseValues.AddRange(booleanValues);
 		}
 
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "BooleanValues", 137);
 		return memberMap;
 	}
 
@@ -131,6 +145,7 @@ public class MemberMapTypeConverterOption
 	/// <returns></returns>
 	public virtual MemberMap NullValues(params string[] nullValues)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "NullValues", 148);
 		return NullValues(true, nullValues);
 	}
 
@@ -142,13 +157,16 @@ public class MemberMapTypeConverterOption
 	/// <returns></returns>
 	public virtual MemberMap NullValues(bool clearValues, params string[] nullValues)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "NullValues", 160);
 		if (clearValues)
 		{
+			FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "NullValues", 163);
 			memberMap.Data.TypeConverterOptions.NullValues.Clear();
 		}
 
 		memberMap.Data.TypeConverterOptions.NullValues.AddRange(nullValues);
 
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "NullValues", 169);
 		return memberMap;
 	}
 
@@ -158,6 +176,7 @@ public class MemberMapTypeConverterOption
 	/// <param name="ignoreCase"><c>true</c> to ignore case, otherwise <c>false</c>.</param>
 	public virtual MemberMap EnumIgnoreCase(bool ignoreCase = true)
 	{
+		FuzzingLogsCollector.Log("MemberMapTypeConverterOption", "EnumIgnoreCase", 179);
 		memberMap.Data.TypeConverterOptions.EnumIgnoreCase = ignoreCase;
 
 		return memberMap;

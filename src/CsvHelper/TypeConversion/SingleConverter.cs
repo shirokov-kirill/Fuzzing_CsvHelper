@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -23,13 +24,16 @@ public class SingleConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("SingleConverter", "ConvertToString", 27);
 		var format = memberMapData.TypeConverterOptions.Formats?.FirstOrDefault() ?? defaultFormat.Value;
 
 		if (value is float f)
 		{
+			FuzzingLogsCollector.Log("SingleConverter", "ConvertToString", 32);
 			return f.ToString(format, memberMapData.TypeConverterOptions.CultureInfo);
 		}
 
+		FuzzingLogsCollector.Log("SingleConverter", "ConvertToString", 36);
 		return base.ConvertToString(value, row, memberMapData);
 	}
 
@@ -42,13 +46,16 @@ public class SingleConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("SingleConverter", "ConvertFromString", 49);
 		var numberStyle = memberMapData.TypeConverterOptions.NumberStyles ?? NumberStyles.Float | NumberStyles.AllowThousands;
 
 		if (float.TryParse(text, numberStyle, memberMapData.TypeConverterOptions.CultureInfo, out var f))
 		{
+			FuzzingLogsCollector.Log("SingleConverter", "ConvertFromString", 54);
 			return f;
 		}
 
+		FuzzingLogsCollector.Log("SingleConverter", "ConvertFromString", 58);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

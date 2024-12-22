@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using CsvHelper.FuzzingLogger;
 
 // https://blog.markvincze.com/back-to-basics-dictionary-part-2-net-implementation/
 
@@ -23,6 +24,7 @@ internal class FieldCache
 
 	public FieldCache(int initialSize = 128, int maxFieldSize = 128)
 	{
+		FuzzingLogsCollector.Log("FieldCache", "FieldCache", 27);
 		this.maxFieldSize = maxFieldSize;
 		size = initialSize;
 		buckets = new int[size];
@@ -31,13 +33,16 @@ internal class FieldCache
 
 	public string GetField(char[] buffer, int start, int length)
 	{
+		FuzzingLogsCollector.Log("FieldCache", "GetField", 36);
 		if (length == 0)
 		{
+			FuzzingLogsCollector.Log("FieldCache", "GetField", 39);
 			return string.Empty;
 		}
 
 		if (length > maxFieldSize)
 		{
+			FuzzingLogsCollector.Log("FieldCache", "GetField", 45);
 			return new string(buffer, start, length);
 		}
 
@@ -46,10 +51,12 @@ internal class FieldCache
 		int i = bucket - 1;
 		while ((uint)i < (uint)entries.Length)
 		{
+			FuzzingLogsCollector.Log("FieldCache", "GetField", 54);
 			ref var entry = ref entries[i];
 
 			if (entry.HashCode == hashCode && entry.Value.AsSpan().SequenceEqual(new Span<char>(buffer, start, length)))
 			{
+				FuzzingLogsCollector.Log("FieldCache", "GetField", 59);
 				return entry.Value;
 			}
 
@@ -58,10 +65,12 @@ internal class FieldCache
 
 		if (count == entries.Length)
 		{
+			FuzzingLogsCollector.Log("FieldCache", "GetField", 68);
 			Resize();
 			bucket = ref GetBucket(hashCode);
 		}
 
+		FuzzingLogsCollector.Log("FieldCache", "GetField", 73);
 		ref var reference = ref entries[count];
 		reference.HashCode = hashCode;
 		reference.Next = bucket - 1;
@@ -90,12 +99,14 @@ internal class FieldCache
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private ref int GetBucket(uint hashCode)
 	{
+		FuzzingLogsCollector.Log("FieldCache", "GetBucket", 102);
 		return ref buckets[hashCode & buckets.Length - 1];
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void Resize()
 	{
+		FuzzingLogsCollector.Log("FieldCache", "Resize", 109);
 		size *= 2;
 
 		var tempEntries = new Entry[size];
@@ -106,16 +117,19 @@ internal class FieldCache
 
 		for (int i = 0; i < count; i++)
 		{
+			FuzzingLogsCollector.Log("FieldCache", "Resize", 120);
 			ref var tempEntry = ref tempEntries[i];
 
 			if (tempEntry.Next >= -1)
 			{
+				FuzzingLogsCollector.Log("FieldCache", "Resize", 125);
 				ref var bucket = ref GetBucket(tempEntry.HashCode);
 				tempEntry.Next = bucket - 1;
 				bucket = i + 1;
 			}
 		}
 
+		FuzzingLogsCollector.Log("FieldCache", "Resize", 132);
 		entries = tempEntries;
 	}
 

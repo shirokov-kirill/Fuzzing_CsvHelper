@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,13 +22,16 @@ public class DecimalConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("DecimalConverter", "ConvertFromString", 25);
 		var numberStyle = memberMapData.TypeConverterOptions.NumberStyles ?? NumberStyles.Number;
 
 		if (decimal.TryParse(text, numberStyle, memberMapData.TypeConverterOptions.CultureInfo, out var d))
 		{
+			FuzzingLogsCollector.Log("DecimalConverter", "ConvertFromString", 30);
 			return d;
 		}
 
+		FuzzingLogsCollector.Log("DecimalConverter", "ConvertFromString", 34);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

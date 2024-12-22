@@ -2,6 +2,9 @@
 // This file is a part of CsvHelper and is dual licensed under MS-PL and Apache 2.0.
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
+
+using CsvHelper.FuzzingLogger;
+
 namespace CsvHelper.TypeConversion;
 
 /// <summary>
@@ -18,11 +21,14 @@ public class TypeConverterOptionsCache
 	/// <param name="options">The options.</param>
 	public void AddOptions(Type type, TypeConverterOptions options)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions", 21);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions", 27);
 			throw new ArgumentNullException(nameof(type));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions", 31);
 		typeConverterOptions[type] = options ?? throw new ArgumentNullException(nameof(options));
 	}
 
@@ -33,6 +39,7 @@ public class TypeConverterOptionsCache
 	/// <param name="options">The options.</param>
 	public void AddOptions<T>(TypeConverterOptions options)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions<T>", 42);
 		AddOptions(typeof(T), options);
 	}
 
@@ -42,8 +49,10 @@ public class TypeConverterOptionsCache
 	/// <param name="options"></param>
 	public void AddOptions(TypeConverterOptions options)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions", 52);
 		foreach (var type in typeConverterOptions.Keys)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptionsCache", "AddOptions", 55);
 			typeConverterOptions[type] = options;
 		}
 	}
@@ -54,11 +63,14 @@ public class TypeConverterOptionsCache
 	/// <param name="type">The type to remove the options for.</param>
 	public void RemoveOptions(Type type)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "RemoveOptions", 66);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptionsCache", "RemoveOptions", 69);
 			throw new ArgumentNullException(nameof(type));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "RemoveOptions", 73);
 		typeConverterOptions.Remove(type);
 	}
 
@@ -68,6 +80,7 @@ public class TypeConverterOptionsCache
 	/// <typeparam name="T">The type to remove the options for.</typeparam>
 	public void RemoveOptions<T>()
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "RemoveOptions<T>", 83);
 		RemoveOptions(typeof(T));
 	}
 
@@ -78,17 +91,21 @@ public class TypeConverterOptionsCache
 	/// <returns>The options for the given type.</returns>
 	public TypeConverterOptions GetOptions(Type type)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "GetOptions", 94);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptionsCache", "GetOptions", 97);
 			throw new ArgumentNullException();
 		}
 
 		if (!typeConverterOptions.TryGetValue(type, out var options))
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptionsCache", "GetOptions", 103);
 			options = new TypeConverterOptions();
 			typeConverterOptions.Add(type, options);
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "GetOptions", 108);
 		return options;
 	}
 
@@ -99,6 +116,7 @@ public class TypeConverterOptionsCache
 	/// <returns>The options for the given type.</returns>
 	public TypeConverterOptions GetOptions<T>()
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptionsCache", "GetOptions<T>", 119);
 		return GetOptions(typeof(T));
 	}
 }

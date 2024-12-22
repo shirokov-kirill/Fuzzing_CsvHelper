@@ -7,6 +7,7 @@ using System.Collections;
 using System.Dynamic;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -32,9 +33,10 @@ public class DynamicRecordWriter : RecordWriter
 	protected override Action<T> CreateWriteDelegate<T>(Type type)
 	{
 		// http://stackoverflow.com/a/14011692/68499
-
+		FuzzingLogsCollector.Log("DynamicRecordWriter", "CreateWriteDelegate<T>", 36);
 		Action<T> action = r =>
 		{
+			FuzzingLogsCollector.Log("DynamicRecordWriter", "CreateWriteDelegate<T>", 39);
 			var provider = (IDynamicMetaObjectProvider)r!;
 			var type = provider.GetType();
 
@@ -43,16 +45,19 @@ public class DynamicRecordWriter : RecordWriter
 			var memberNames = metaObject.GetDynamicMemberNames();
 			if (Writer.Configuration.DynamicPropertySort != null)
 			{
+				FuzzingLogsCollector.Log("DynamicRecordWriter", "CreateWriteDelegate<T>", 48);
 				memberNames = memberNames.OrderBy(name => name, Writer.Configuration.DynamicPropertySort);
 			}
 
 			foreach (var name in memberNames)
 			{
+				FuzzingLogsCollector.Log("DynamicRecordWriter", "CreateWriteDelegate<T>", 54);
 				var value = GetValue(name, provider);
 				Writer.WriteField(value);
 			}
 		};
 
+		FuzzingLogsCollector.Log("DynamicRecordWriter", "CreateWriteDelegate<T>", 60);
 		return action;
 	}
 
@@ -60,13 +65,16 @@ public class DynamicRecordWriter : RecordWriter
 	{
 		// https://stackoverflow.com/a/30757547/68499
 
+		FuzzingLogsCollector.Log("DynamicRecordWriter", "GetValue", 68);
 		var callSite = (CallSite<Func<CallSite, IDynamicMetaObjectProvider, object>>?)getters[name];
 		if (callSite == null)
 		{
+			FuzzingLogsCollector.Log("DynamicRecordWriter", "GetValue", 72);
 			var getMemberBinder = Binder.GetMember(CSharpBinderFlags.None, name, typeof(DynamicRecordWriter), new CSharpArgumentInfo[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
 			getters[name] = callSite = CallSite<Func<CallSite, IDynamicMetaObjectProvider, object>>.Create(getMemberBinder);
 		}
 
+		FuzzingLogsCollector.Log("DynamicRecordWriter", "GetValue", 77);
 		return callSite.Target(callSite, target);
 	}
 }

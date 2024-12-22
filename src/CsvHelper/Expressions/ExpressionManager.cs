@@ -6,6 +6,7 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -23,6 +24,7 @@ public class ExpressionManager
 	/// <param name="reader">The reader.</param>
 	public ExpressionManager(CsvReader reader)
 	{
+		FuzzingLogsCollector.Log("ExpressionManager", "ExpressionManager", 27);
 		this.reader = reader;
 	}
 
@@ -32,6 +34,7 @@ public class ExpressionManager
 	/// <param name="writer">The writer.</param>
 	public ExpressionManager(CsvWriter writer)
 	{
+		FuzzingLogsCollector.Log("ExpressionManager", "ExpressionManager", 37);
 		this.writer = writer;
 	}
 
@@ -42,12 +45,19 @@ public class ExpressionManager
 	/// <param name="argumentExpressions">The arguments that will be added to the mapping.</param>
 	public virtual void CreateConstructorArgumentExpressionsForMapping(ClassMap map, List<Expression> argumentExpressions)
 	{
-		if (reader == null) throw new InvalidOperationException("Reader is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 48);
+		if (reader == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 51);
+			throw new InvalidOperationException("Reader is null");
+		}
 
 		foreach (var parameterMap in map.ParameterMaps)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 57);
 			if (parameterMap.Data.IsConstantSet)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 60);
 				var constantExpression = Expression.Convert(Expression.Constant(parameterMap.Data.Constant), parameterMap.Data.Parameter.ParameterType);
 				argumentExpressions.Add(constantExpression);
 
@@ -56,20 +66,25 @@ public class ExpressionManager
 
 			if (parameterMap.Data.Ignore)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 69);
 				Expression defaultExpression;
 				if (parameterMap.Data.IsDefaultSet)
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 73);
 					defaultExpression = Expression.Convert(Expression.Constant(parameterMap.Data.Default), parameterMap.Data.Parameter.ParameterType);
 				}
 				else if (parameterMap.Data.Parameter.HasDefaultValue)
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 78);
 					defaultExpression = Expression.Convert(Expression.Constant(parameterMap.Data.Parameter.DefaultValue), parameterMap.Data.Parameter.ParameterType);
 				}
 				else
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 83);
 					defaultExpression = Expression.Default(parameterMap.Data.Parameter.ParameterType);
 				}
 
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 87);
 				argumentExpressions.Add(defaultExpression);
 
 				continue;
@@ -77,6 +92,7 @@ public class ExpressionManager
 
 			if (parameterMap.ConstructorTypeMap != null)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 95);
 				// Constructor parameter type.
 				var arguments = new List<Expression>();
 				CreateConstructorArgumentExpressionsForMapping(parameterMap.ConstructorTypeMap, arguments);
@@ -87,6 +103,7 @@ public class ExpressionManager
 			}
 			else if (parameterMap.ReferenceMap != null)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 106);
 				// Reference type.
 
 				var referenceAssignments = new List<MemberAssignment>();
@@ -97,28 +114,33 @@ public class ExpressionManager
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 117);
 				// Value type.
 
 				int index;
 				if (reader.Configuration.HasHeaderRecord && (parameterMap.Data.IsNameSet || !parameterMap.Data.IsIndexSet))
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 123);
 					// Use name.
 					index = reader.GetFieldIndex(parameterMap.Data.Names, parameterMap.Data.NameIndex, parameterMap.Data.IsOptional);
 					if (index == -1)
 					{
+						FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 128);
 						if (parameterMap.Data.IsDefaultSet || parameterMap.Data.IsOptional)
 						{
+							FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 131);
 							var defaultExpression = CreateDefaultExpression(parameterMap, Expression.Constant(string.Empty));
 							argumentExpressions.Add(defaultExpression);
 							continue;
 						}
-
+						FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 136);
 						// Skip if the index was not found.
 						continue;
 					}
 				}
 				else if (!parameterMap.Data.IsIndexSet && parameterMap.Data.IsOptional)
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 143);
 					// If there wasn't an index explicitly, use a default value since constructors need all
 					// arguments to be created.
 					var defaultExpression = CreateDefaultExpression(parameterMap, Expression.Constant(string.Empty));
@@ -127,23 +149,28 @@ public class ExpressionManager
 				}
 				else
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 152);
 					// Use index.
 					index = parameterMap.Data.Index;
 				}
 
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 157);
 				// Get the field using the field index.
 				var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) })!.GetGetMethod()!;
 				Expression fieldExpression = Expression.Call(Expression.Constant(reader), method, Expression.Constant(index, typeof(int)));
 
 				if (parameterMap.Data.IsDefaultSet)
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 164);
 					fieldExpression = CreateDefaultExpression(parameterMap, fieldExpression);
 				}
 				else
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 169);
 					fieldExpression = CreateTypeConverterExpression(parameterMap, fieldExpression);
 				}
 
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateConstructorArgumentExpressionsForMapping", 173);
 				argumentExpressions.Add(fieldExpression);
 			}
 		}
@@ -156,13 +183,20 @@ public class ExpressionManager
 	/// <param name="assignments">The assignments that will be added to from the mapping.</param>
 	public virtual void CreateMemberAssignmentsForMapping(ClassMap mapping, List<MemberAssignment> assignments)
 	{
-		if (reader == null) throw new InvalidOperationException("Reader is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 186);
+		if (reader == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 189);
+			throw new InvalidOperationException("Reader is null");
+		}
 
 		foreach (var memberMap in mapping.MemberMaps)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 195);
 			var fieldExpression = CreateGetFieldExpression(memberMap);
 			if (fieldExpression == null)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 199);
 				continue;
 			}
 
@@ -171,14 +205,17 @@ public class ExpressionManager
 
 		foreach (var referenceMap in mapping.ReferenceMaps)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 208);
 			if (!reader.CanRead(referenceMap))
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 211);
 				continue;
 			}
 
 			Expression referenceBody;
 			if (referenceMap.Data.Mapping.ParameterMaps.Count > 0)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 218);
 				var arguments = new List<Expression>();
 				CreateConstructorArgumentExpressionsForMapping(referenceMap.Data.Mapping, arguments);
 				var args = new GetConstructorArgs(referenceMap.Data.Mapping.ClassType);
@@ -186,11 +223,13 @@ public class ExpressionManager
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 226);
 				var referenceAssignments = new List<MemberAssignment>();
 				CreateMemberAssignmentsForMapping(referenceMap.Data.Mapping, referenceAssignments);
 				referenceBody = CreateInstanceAndAssignMembers(referenceMap.Data.Member.MemberType(), referenceAssignments);
 			}
 
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateMemberAssignmentsForMapping", 232);
 			assignments.Add(Expression.Bind(referenceMap.Data.Member, referenceBody));
 		}
 	}
@@ -202,10 +241,16 @@ public class ExpressionManager
 	/// <param name="memberMap">The mapping for the member.</param>
 	public virtual Expression? CreateGetFieldExpression(MemberMap memberMap)
 	{
-		if (reader == null) throw new InvalidOperationException("Reader is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 244);
+		if (reader == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 247);
+			throw new InvalidOperationException("Reader is null");
+		}
 
 		if (memberMap.Data.ReadingConvertExpression != null)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 253);
 			// The user is providing the expression to do the conversion.
 			Expression exp = Expression.Invoke(memberMap.Data.ReadingConvertExpression, Expression.Constant(new ConvertFromStringArgs(reader)));
 			return Expression.Convert(exp, memberMap.Data.Member!.MemberType());
@@ -213,16 +258,19 @@ public class ExpressionManager
 
 		if (!reader.CanRead(memberMap))
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 261);
 			return null;
 		}
 
 		if (memberMap.Data.IsConstantSet)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 267);
 			return Expression.Convert(Expression.Constant(memberMap.Data.Constant), memberMap.Data.Member!.MemberType());
 		}
 
 		if (memberMap.Data.TypeConverter == null)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 273);
 			// Skip if the type isn't convertible.
 			return null;
 		}
@@ -230,14 +278,18 @@ public class ExpressionManager
 		int index;
 		if (reader.Configuration.HasHeaderRecord && (memberMap.Data.IsNameSet || !memberMap.Data.IsIndexSet))
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 281);
 			// Use the name.
 			index = reader.GetFieldIndex(memberMap.Data.Names, memberMap.Data.NameIndex, memberMap.Data.IsOptional);
 			if (index == -1)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 286);
 				if (memberMap.Data.IsDefaultSet)
 				{
+					FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 289);
 					return CreateDefaultExpression(memberMap, Expression.Constant(string.Empty));
 				}
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 292);
 
 				// Skip if the index was not found.
 				return null;
@@ -245,10 +297,12 @@ public class ExpressionManager
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 300);
 			// Use the index.
 			index = memberMap.Data.Index;
 		}
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 305);
 		// Get the field using the field index.
 		var method = typeof(IReaderRow).GetProperty("Item", typeof(string), new[] { typeof(int) })!.GetGetMethod()!;
 		Expression fieldExpression = Expression.Call(Expression.Constant(reader), method, Expression.Constant(index, typeof(int)));
@@ -256,6 +310,7 @@ public class ExpressionManager
 		// Validate the field.
 		if (memberMap.Data.ValidateExpression != null)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 313);
 			var constructor = typeof(ValidateArgs).GetConstructor(new Type[] { typeof(string), typeof(IReaderRow) })!;
 			var args = Expression.New(constructor, fieldExpression, Expression.Constant(reader));
 			var validateExpression = Expression.IsFalse(Expression.Invoke(memberMap.Data.ValidateExpression, args));
@@ -272,11 +327,13 @@ public class ExpressionManager
 
 		if (memberMap.Data.IsDefaultSet)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 330);
 			return CreateDefaultExpression(memberMap, fieldExpression);
 		}
 
 		fieldExpression = CreateTypeConverterExpression(memberMap, fieldExpression);
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateGetFieldExpression", 336);
 		return fieldExpression;
 	}
 
@@ -291,18 +348,26 @@ public class ExpressionManager
 	/// <returns>An Expression to access the given member.</returns>
 	public virtual Expression? CreateGetMemberExpression(Expression recordExpression, ClassMap mapping, MemberMap memberMap)
 	{
-		if (writer == null) throw new InvalidOperationException("Writer is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 351);
+		if (writer == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 354);
+			throw new InvalidOperationException("Writer is null");
+		}
 
 		if (mapping.MemberMaps.Any(mm => mm == memberMap))
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 360);
 			// The member is on this level.
 			if (memberMap.Data.Member is PropertyInfo)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 364);
 				return Expression.Property(recordExpression, (PropertyInfo)memberMap.Data.Member);
 			}
 
 			if (memberMap.Data.Member is FieldInfo)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 370);
 				return Expression.Field(recordExpression, (FieldInfo)memberMap.Data.Member);
 			}
 		}
@@ -311,18 +376,22 @@ public class ExpressionManager
 		// We need to search down through the reference maps.
 		foreach (var refMap in mapping.ReferenceMaps)
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 379);
 			var wrapped = refMap.Data.Member.GetMemberExpression(recordExpression);
 			var memberExpression = CreateGetMemberExpression(wrapped, refMap.Data.Mapping, memberMap);
 			if (memberExpression == null)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 384);
 				continue;
 			}
 
 			if (refMap.Data.Member.MemberType().GetTypeInfo().IsValueType)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 390);
 				return memberExpression;
 			}
 
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 394);
 			var nullCheckExpression = Expression.Equal(wrapped, Expression.Constant(null));
 
 			var isValueType = memberMap.Data.Member!.MemberType().GetTypeInfo().IsValueType;
@@ -330,11 +399,13 @@ public class ExpressionManager
 			Type memberType;
 			if (isValueType && !isGenericType && !writer.Configuration.UseNewObjectForNullReferenceMembers)
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 402);
 				memberType = typeof(Nullable<>).MakeGenericType(memberMap.Data.Member!.MemberType());
 				memberExpression = Expression.Convert(memberExpression, memberType);
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 408);
 				memberType = memberMap.Data.Member!.MemberType();
 			}
 
@@ -342,9 +413,11 @@ public class ExpressionManager
 				? (Expression)Expression.New(memberType)
 				: Expression.Constant(null, memberType);
 			var conditionExpression = Expression.Condition(nullCheckExpression, defaultValueExpression, memberExpression);
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 416);
 			return conditionExpression;
 		}
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateGetMemberExpression", 420);
 		return null;
 	}
 
@@ -357,6 +430,7 @@ public class ExpressionManager
 	/// <returns>A <see cref="BlockExpression"/> representing the instance creation and assignments.</returns>
 	public virtual BlockExpression CreateInstanceAndAssignMembers(Type recordType, List<MemberAssignment> assignments)
 	{
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateInstanceAndAssignMembers", 433);
 		var expressions = new List<Expression>();
 		var createInstanceMethod = typeof(IObjectResolver).GetMethod(nameof(IObjectResolver.Resolve), new Type[] { typeof(Type), typeof(object[]) })!;
 		var instanceExpression = Expression.Convert(Expression.Call(Expression.Constant(ObjectResolver.Current), createInstanceMethod, Expression.Constant(recordType), Expression.Constant(new object[0])), recordType);
@@ -367,6 +441,7 @@ public class ExpressionManager
 		var variables = new ParameterExpression[] { variableExpression };
 		var blockExpression = Expression.Block(variables, expressions);
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateInstanceAndAssignMembers", 444);
 		return blockExpression;
 	}
 
@@ -377,13 +452,20 @@ public class ExpressionManager
 	/// <param name="fieldExpression">The field expression.</param>
 	public virtual Expression CreateTypeConverterExpression(MemberMap memberMap, Expression fieldExpression)
 	{
-		if (reader == null) throw new InvalidOperationException("Reader is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 455);
+		if (reader == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 458);
+			throw new InvalidOperationException("Reader is null");
+		}
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 462);
 		memberMap.Data.TypeConverterOptions = TypeConverterOptions.Merge(new TypeConverterOptions { CultureInfo = reader.Configuration.CultureInfo }, reader.Context.TypeConverterOptionsCache.GetOptions(memberMap.Data.Member!.MemberType()), memberMap.Data.TypeConverterOptions);
 
 		Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMap.Data));
 		typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, memberMap.Data.Member!.MemberType());
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 468);
 		return typeConverterFieldExpression;
 	}
 
@@ -394,7 +476,13 @@ public class ExpressionManager
 	/// <param name="fieldExpression">The field expression.</param>
 	public virtual Expression CreateTypeConverterExpression(ParameterMap parameterMap, Expression fieldExpression)
 	{
-		if (reader == null) throw new InvalidOperationException("Reader is null");
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 479);
+		if (reader == null)
+		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 482);
+			throw new InvalidOperationException("Reader is null");
+		}
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 485);
 
 		parameterMap.Data.TypeConverterOptions = TypeConverterOptions.Merge
 		(
@@ -422,6 +510,7 @@ public class ExpressionManager
 		Expression typeConverterFieldExpression = Expression.Call(Expression.Constant(parameterMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, fieldExpression, Expression.Constant(reader), Expression.Constant(memberMapData));
 		typeConverterFieldExpression = Expression.Convert(typeConverterFieldExpression, parameterMap.Data.Parameter.ParameterType);
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateTypeConverterExpression", 513);
 		return typeConverterFieldExpression;
 	}
 
@@ -432,21 +521,25 @@ public class ExpressionManager
 	/// <param name="fieldExpression">The field expression.</param>
 	public virtual Expression CreateDefaultExpression(MemberMap memberMap, Expression fieldExpression)
 	{
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 513);
 		var typeConverterExpression = CreateTypeConverterExpression(memberMap, fieldExpression);
 
 		// Create default value expression.
 		Expression defaultValueExpression;
 		if (memberMap.Data.Member!.MemberType() != typeof(string) && memberMap.Data.Default != null && memberMap.Data.Default.GetType() == typeof(string))
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 531);
 			// The default is a string but the member type is not. Use a converter.
 			defaultValueExpression = Expression.Call(Expression.Constant(memberMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, Expression.Constant(memberMap.Data.Default), Expression.Constant(reader), Expression.Constant(memberMap.Data));
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 537);
 			// The member type and default type match.
 			defaultValueExpression = Expression.Constant(memberMap.Data.Default);
 		}
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 542);
 		defaultValueExpression = Expression.Convert(defaultValueExpression, memberMap.Data.Member!.MemberType());
 
 		// If null, use string.Empty.
@@ -458,6 +551,7 @@ public class ExpressionManager
 		// Use a default value if the field is an empty string.
 		fieldExpression = Expression.Condition(checkFieldEmptyExpression, defaultValueExpression, typeConverterExpression);
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 554);
 		return fieldExpression;
 	}
 
@@ -468,22 +562,26 @@ public class ExpressionManager
 	/// <param name="fieldExpression">The field expression.</param>
 	public virtual Expression CreateDefaultExpression(ParameterMap parameterMap, Expression fieldExpression)
 	{
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 565);
 		var typeConverterExpression = CreateTypeConverterExpression(parameterMap, fieldExpression);
 
 		// Create default value expression.
 		Expression defaultValueExpression;
 		if (parameterMap.Data.Parameter.ParameterType != typeof(string) && parameterMap.Data.Default != null && parameterMap.Data.Default.GetType() == typeof(string))
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 572);
 			// The default is a string but the member type is not. Use a converter.
 			//defaultValueExpression = Expression.Call(Expression.Constant(parameterMap.Data.TypeConverter), nameof(ITypeConverter.ConvertFromString), null, Expression.Constant(parameterMap.Data.Default), Expression.Constant(reader), Expression.Constant(memberMap.Data));
 			defaultValueExpression = CreateTypeConverterExpression(parameterMap, Expression.Constant(parameterMap.Data.Default));
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 579);
 			// The member type and default type match.
 			defaultValueExpression = Expression.Convert(Expression.Constant(parameterMap.Data.Default), parameterMap.Data.Parameter.ParameterType);
 		}
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 584);
 		// If null, use string.Empty.
 		var coalesceExpression = Expression.Coalesce(fieldExpression, Expression.Constant(string.Empty));
 
@@ -493,6 +591,7 @@ public class ExpressionManager
 		// Use a default value if the field is an empty string.
 		fieldExpression = Expression.Condition(checkFieldEmptyExpression, defaultValueExpression, typeConverterExpression);
 
+		FuzzingLogsCollector.Log("ExpressionManager", "CreateDefaultExpression", 594);
 		return fieldExpression;
 	}
 }

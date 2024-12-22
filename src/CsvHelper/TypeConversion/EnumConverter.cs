@@ -5,6 +5,7 @@
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -31,8 +32,10 @@ public class EnumConverter : DefaultTypeConverter
 	/// <param name="type">The type of the Enum.</param>
 	public EnumConverter(Type type)
 	{
+		FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 35);
 		if (!typeof(Enum).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 38);
 			throw new ArgumentException($"'{type.FullName}' is not an Enum.");
 		}
 
@@ -40,44 +43,54 @@ public class EnumConverter : DefaultTypeConverter
 
 		foreach (var value in Enum.GetValues(type))
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 46);
 			var enumName = Enum.GetName(type, value) ?? string.Empty;
 
 			var nameAttribute = type.GetField(enumName)?.GetCustomAttribute<NameAttribute>();
 			if (nameAttribute != null && nameAttribute.Names.Length > 0)
 			{
+				FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 52);
 				foreach (var attributeName in nameAttribute.Names)
 				{
+					FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 55);
 					if (!enumNamesByAttributeNames.ContainsKey(attributeName))
 					{
+						FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 58);
 						enumNamesByAttributeNames.Add(attributeName, enumName);
 					}
 
 					if (!enumNamesByAttributeNamesIgnoreCase.ContainsKey(attributeName))
 					{
+						FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 64);
 						enumNamesByAttributeNamesIgnoreCase.Add(attributeName, enumName);
 					}
 
 					if (!attributeNamesByEnumValues.ContainsKey(value))
 					{
+						FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 70);
 						attributeNamesByEnumValues.Add(value, attributeName);
 					}
 				}
 			}
 		}
+		FuzzingLogsCollector.Log("EnumConverter", "EnumConverter", 76);
 	}
 
 	/// <inheritdoc/>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("EnumConverter", "ConvertFromString", 82);
 		var ignoreCase = memberMapData.TypeConverterOptions.EnumIgnoreCase ?? false;
 
 		if (text != null)
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "ConvertFromString", 87);
 			var dict = ignoreCase
 				? enumNamesByAttributeNamesIgnoreCase
 				: enumNamesByAttributeNames;
 			if (dict.TryGetValue(text, out var name))
 			{
+				FuzzingLogsCollector.Log("EnumConverter", "ConvertFromString", 93);
 				return Enum.Parse(type, name);
 			}
 		}
@@ -94,10 +107,12 @@ public class EnumConverter : DefaultTypeConverter
 #else
 		try
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "ConvertFromString", 110);
 			return Enum.Parse(type, text, ignoreCase);
 		}
 		catch
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "ConvertFromString", 115);
 			return base.ConvertFromString(text, row, memberMapData);
 		}
 #endif
@@ -106,11 +121,14 @@ public class EnumConverter : DefaultTypeConverter
 	/// <inheritdoc/>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("EnumConverter", "ConvertToString", 124);
 		if (value != null && attributeNamesByEnumValues.TryGetValue(value, out var name))
 		{
+			FuzzingLogsCollector.Log("EnumConverter", "ConvertToString", 127);
 			return name;
 		}
 
+		FuzzingLogsCollector.Log("EnumConverter", "ConvertToString", 131);
 		return base.ConvertToString(value, row, memberMapData);
 	}
 }

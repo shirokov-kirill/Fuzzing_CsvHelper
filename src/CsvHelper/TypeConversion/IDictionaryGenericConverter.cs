@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,6 +22,7 @@ public class IDictionaryGenericConverter : IDictionaryConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IDictionaryGenericConverter", "ConvertFromString", 25);
 		var keyType = memberMapData.Member!.MemberType().GetGenericArguments()[0];
 		var valueType = memberMapData.Member!.MemberType().GetGenericArguments()[1];
 		var dictionaryType = typeof(Dictionary<,>);
@@ -34,11 +36,13 @@ public class IDictionaryGenericConverter : IDictionaryConverter
 
 		for (var i = memberMapData.Index; i <= indexEnd; i++)
 		{
+			FuzzingLogsCollector.Log("IDictionaryGenericConverter", "ConvertFromString", 39);
 			var field = converter.ConvertFromString(row.GetField(i), row, memberMapData);
 
 			dictionary.Add(row.HeaderRecord![i], field);
 		}
 
+		FuzzingLogsCollector.Log("IDictionaryGenericConverter", "ConvertFromString", 45);
 		return dictionary;
 	}
 }

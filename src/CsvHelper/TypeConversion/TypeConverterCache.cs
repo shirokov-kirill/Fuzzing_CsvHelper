@@ -5,6 +5,7 @@
 using CsvHelper.Configuration.Attributes;
 using System.Numerics;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -23,6 +24,7 @@ public class TypeConverterCache
 	/// </summary>
 	public TypeConverterCache()
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "TypeConverterCache", 27);
 		CreateDefaultConverters();
 	}
 
@@ -33,6 +35,7 @@ public class TypeConverterCache
 	/// <returns><c>true</c> if the converter is registered, otherwise false.</returns>
 	public bool Contains(Type type)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "Contains", 38);
 		return typeConverters.ContainsKey(type);
 	}
 
@@ -43,11 +46,14 @@ public class TypeConverterCache
 	/// <param name="typeConverterFactory">Type converter factory</param>
 	public void AddConverterFactory(ITypeConverterFactory typeConverterFactory)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverterFactory", 49);
 		if (typeConverterFactory == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "AddConverterFactory", 52);
 			throw new ArgumentNullException(nameof(typeConverterFactory));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverterFactory", 56);
 		typeConverterFactories.Add(typeConverterFactory);
 	}
 
@@ -58,16 +64,20 @@ public class TypeConverterCache
 	/// <param name="typeConverter">The type converter that converts the type.</param>
 	public void AddConverter(Type type, ITypeConverter typeConverter)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 67);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 70);
 			throw new ArgumentNullException(nameof(type));
 		}
 
 		if (typeConverter == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 76);
 			throw new ArgumentNullException(nameof(typeConverter));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 80);
 		typeConverters[type] = typeConverter;
 	}
 
@@ -86,11 +96,14 @@ public class TypeConverterCache
 	/// <param name="typeConverter">The type converter that converts the type.</param>
 	public void AddConverter<T>(ITypeConverter typeConverter)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter<T>", 99);
 		if (typeConverter == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter<T>", 102);
 			throw new ArgumentNullException(nameof(typeConverter));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter<T>", 106);
 		typeConverters[typeof(T)] = typeConverter;
 	}
 
@@ -100,8 +113,10 @@ public class TypeConverterCache
 	/// <param name="typeConverter">The type converter.</param>
 	public void AddConverter(ITypeConverter typeConverter)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 116);
 		foreach (var type in typeConverters.Keys)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "AddConverter", 119);
 			typeConverters[type] = typeConverter;
 		}
 	}
@@ -112,11 +127,14 @@ public class TypeConverterCache
 	/// <param name="type">The type to remove the converter for.</param>
 	public void RemoveConverter(Type type)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverter", 130);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverter", 133);
 			throw new ArgumentNullException(nameof(type));
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverter", 137);
 		typeConverters.Remove(type);
 	}
 
@@ -126,6 +144,7 @@ public class TypeConverterCache
 	/// <typeparam name="T">The type to remove the converter for.</typeparam>
 	public void RemoveConverter<T>()
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverter<T>", 147);
 		RemoveConverter(typeof(T));
 	}
 
@@ -135,10 +154,12 @@ public class TypeConverterCache
 	/// <param name="typeConverterFactory">The ITypeConverterFactory to remove.</param>
 	public void RemoveConverterFactory(ITypeConverterFactory typeConverterFactory)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverterFactory", 157);
 		typeConverterFactories.Remove(typeConverterFactory);
 		var toRemove = typeConverterFactoryCache.Where(pair => pair.Value == typeConverterFactory);
 		foreach (var pair in toRemove)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "RemoveConverterFactory", 162);
 			typeConverterFactoryCache.Remove(pair.Key);
 		}
 	}
@@ -150,35 +171,44 @@ public class TypeConverterCache
 	/// <returns>The <see cref="ITypeConverter"/> for the given <see cref="System.Type"/>.</returns>
 	public ITypeConverter GetConverter(Type type)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 174);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 177);
 			throw new ArgumentNullException(nameof(type));
 		}
 
 		if (typeConverters.TryGetValue(type, out ITypeConverter? typeConverter))
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 183);
 			return typeConverter;
 		}
 
 		if (!typeConverterFactoryCache.TryGetValue(type, out var factory))
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 189);
 			factory = typeConverterFactories.Concat(defaultTypeConverterFactories).FirstOrDefault(f => f.CanCreate(type));
 			if (factory != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 193);
 				typeConverterFactoryCache[type] = factory;
 			}
 		}
 
 		if (factory != null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 200);
 			if (factory.Create(type, this, out typeConverter))
 			{
+				FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 203);
 				AddConverter(type, typeConverter);
 			}
 
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 207);
 			return typeConverter;
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 211);
 		return new DefaultTypeConverter();
 	}
 
@@ -190,12 +220,15 @@ public class TypeConverterCache
 	/// <param name="member">The member to get the converter for.</param>
 	public ITypeConverter GetConverter(MemberInfo member)
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 223);
 		var typeConverterAttribute = member.GetCustomAttribute<TypeConverterAttribute>();
 		if (typeConverterAttribute != null)
 		{
+			FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 227);
 			return typeConverterAttribute.TypeConverter;
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter", 231);
 		return GetConverter(member.MemberType());
 	}
 
@@ -206,11 +239,13 @@ public class TypeConverterCache
 	/// <returns>The <see cref="ITypeConverter"/> for the given <see cref="System.Type"/>.</returns>
 	public ITypeConverter GetConverter<T>()
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "GetConverter<T>", 242);
 		return GetConverter(typeof(T));
 	}
 
 	private void CreateDefaultConverters()
 	{
+		FuzzingLogsCollector.Log("TypeConverterCache", "CreateDefaultConverters", 248);
 		AddConverter(typeof(BigInteger), new BigIntegerConverter());
 		AddConverter(typeof(bool), new BooleanConverter());
 		AddConverter(typeof(byte), new ByteConverter());

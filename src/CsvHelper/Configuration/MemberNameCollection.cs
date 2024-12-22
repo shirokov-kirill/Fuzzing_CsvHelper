@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -21,8 +22,16 @@ public class MemberNameCollection : IEnumerable<string>
 	/// <returns></returns>
 	public string this[int index]
 	{
-		get { return Prefix + names[index]; }
-		set { names[index] = value; }
+		get
+		{
+			FuzzingLogsCollector.Log("MemberNameCollection", "get", 27);
+			return Prefix + names[index];
+		}
+		set
+		{
+			FuzzingLogsCollector.Log("MemberNameCollection", "set", 32);
+			names[index] = value;
+		}
 	}
 
 	/// <summary>
@@ -64,6 +73,7 @@ public class MemberNameCollection : IEnumerable<string>
 	/// <param name="names">The range to add.</param>
 	public void AddRange(IEnumerable<string> names)
 	{
+		FuzzingLogsCollector.Log("MemberNameCollection", "AddRange", 76);
 		this.names.AddRange(names);
 	}
 
@@ -76,8 +86,10 @@ public class MemberNameCollection : IEnumerable<string>
 	/// <filterpriority>1</filterpriority>
 	public IEnumerator<string> GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberNameCollection", "GetEnumerator", 89);
 		for (var i = 0; i < names.Count; i++)
 		{
+			FuzzingLogsCollector.Log("MemberNameCollection", "GetEnumerator", 92);
 			yield return this[i];
 		}
 	}
@@ -91,6 +103,7 @@ public class MemberNameCollection : IEnumerable<string>
 	/// <filterpriority>2</filterpriority>
 	IEnumerator IEnumerable.GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberNameCollection", "GetEnumerator", 106);
 		return names.GetEnumerator();
 	}
 }

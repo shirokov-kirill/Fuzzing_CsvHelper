@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Collections;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,17 +22,21 @@ public class IEnumerableConverter : DefaultTypeConverter
 	/// <returns>The string representation of the object.</returns>
 	public override string? ConvertToString(object? value, IWriterRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertToString", 25);
 		var list = value as IEnumerable;
 		if (list == null)
 		{
+			FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertToString", 29);
 			return base.ConvertToString(value, row, memberMapData);
 		}
 
 		foreach (var item in list)
 		{
+			FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertToString", 35);
 			row.WriteField(item.ToString());
 		}
 
+		FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertToString", 39);
 		return null;
 	}
 
@@ -44,25 +49,31 @@ public class IEnumerableConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 52);
 		var list = new List<string?>();
 
 		if (memberMapData.IsNameSet || row.Configuration.HasHeaderRecord && !memberMapData.IsIndexSet)
 		{
+			FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 57);
 			// Use the name.
 			var nameIndex = 0;
 			while (true)
 			{
+				FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 62);
 				if (!row.TryGetField(memberMapData.Names.FirstOrDefault()!, nameIndex, out string? field))
 				{
+					FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 65);
 					break;
 				}
 
+				FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 69);
 				list.Add(field);
 				nameIndex++;
 			}
 		}
 		else
 		{
+			FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 76);
 			// Use the index.
 			var indexEnd = memberMapData.IndexEnd < memberMapData.Index
 				? row.Parser.Count - 1
@@ -70,13 +81,16 @@ public class IEnumerableConverter : DefaultTypeConverter
 
 			for (var i = memberMapData.Index; i <= indexEnd; i++)
 			{
+				FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 84);
 				if (row.TryGetField(i, out string? field))
 				{
+					FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 87);
 					list.Add(field);
 				}
 			}
 		}
 
+		FuzzingLogsCollector.Log("IEnumerableConverter", "ConvertFromString", 93);
 		return list;
 	}
 }

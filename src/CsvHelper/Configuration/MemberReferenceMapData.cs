@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -21,16 +22,20 @@ public class MemberReferenceMapData
 		get { return prefix; }
 		set
 		{
+			FuzzingLogsCollector.Log("MemberReferenceMapData", "set", 25);
 			prefix = value;
 			foreach (var memberMap in Mapping.MemberMaps)
 			{
+				FuzzingLogsCollector.Log("MemberReferenceMapData", "set", 29);
 				memberMap.Data.Names.Prefix = value;
 			}
 
 			if (Inherit)
 			{
+				FuzzingLogsCollector.Log("MemberReferenceMapData", "set", 35);
 				foreach (var memberRef in Mapping.ReferenceMaps)
 				{
+					FuzzingLogsCollector.Log("MemberReferenceMapData", "set", 38);
 					memberRef.Data.Prefix = memberRef.Data.Prefix == null ? value : string.Concat(value, memberRef.Data.Prefix);
 				}
 			}
@@ -61,6 +66,7 @@ public class MemberReferenceMapData
 	/// <param name="mapping">The mapping this is a reference for.</param>
 	public MemberReferenceMapData(MemberInfo member, ClassMap mapping)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapData", "MemberReferenceMapData", 69);
 		Member = member;
 		Mapping = mapping;
 	}

@@ -7,6 +7,7 @@ using CsvHelper.Delegates;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -119,6 +120,7 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 		get => newLine;
 		set
 		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "set", 123);
 			IsNewLineSet = true;
 			newLine = value;
 		}
@@ -166,6 +168,7 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// <param name="cultureInfo">The culture information.</param>
 	public CsvConfiguration(CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "CsvConfiguration", 171);
 		CultureInfo = cultureInfo;
 		Delimiter = cultureInfo.TextInfo.ListSeparator;
 	}
@@ -182,6 +185,7 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	[Obsolete("This constructor is deprecated and will be removed in the next major release. Use CsvConfiguration(CultureInfo) instead.", false)]
 	public CsvConfiguration(CultureInfo cultureInfo, Type attributesType)
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "CsvConfiguration", 188);
 		CultureInfo = cultureInfo;
 		Delimiter = cultureInfo.TextInfo.ListSeparator;
 
@@ -193,30 +197,88 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// </summary>
 	public void Validate()
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 200);
 		var escape = Escape.ToString();
 		var quote = Quote.ToString();
 		var lineEndings = new[] { "\r", "\n", "\r\n" };
 		var whiteSpaceChars = WhiteSpaceChars.Select(c => c.ToString()).ToArray();
 
 		// Escape
-		if (escape == Delimiter) throw new ConfigurationException($"The escape character '{Escape}' and delimiter '{Delimiter}' cannot be the same.");
-		if (escape == NewLine && IsNewLineSet) throw new ConfigurationException($"The escape character '{Escape}' and new line '{NewLine}' cannot be the same.");
-		if (lineEndings.Contains(Escape.ToString()) && !IsNewLineSet) throw new ConfigurationException($"The escape character '{Escape}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
-		if (whiteSpaceChars.Contains(escape)) throw new ConfigurationException($"The escape character '{Escape}' cannot be a WhiteSpaceChar.");
+		if (escape == Delimiter)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 209);
+			throw new ConfigurationException($"The escape character '{Escape}' and delimiter '{Delimiter}' cannot be the same.");
+		}
+
+		if (escape == NewLine && IsNewLineSet)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 215);
+			throw new ConfigurationException($"The escape character '{Escape}' and new line '{NewLine}' cannot be the same.");
+		}
+
+		if (lineEndings.Contains(Escape.ToString()) && !IsNewLineSet)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 221);
+			throw new ConfigurationException($"The escape character '{Escape}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
+		}
+
+		if (whiteSpaceChars.Contains(escape))
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 227);
+			throw new ConfigurationException($"The escape character '{Escape}' cannot be a WhiteSpaceChar.");
+		}
 
 		// Quote
-		if (quote == Delimiter) throw new ConfigurationException($"The quote character '{Quote}' and the delimiter '{Delimiter}' cannot be the same.");
-		if (quote == NewLine && IsNewLineSet) throw new ConfigurationException($"The quote character '{Quote}' and new line '{NewLine}' cannot be the same.");
-		if (lineEndings.Contains(quote)) throw new ConfigurationException($"The quote character '{Quote}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
-		if (whiteSpaceChars.Contains(quote)) throw new ConfigurationException($"The quote character '{Quote}' cannot be a WhiteSpaceChar.");
+		if (quote == Delimiter)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 234);
+			throw new ConfigurationException($"The quote character '{Quote}' and the delimiter '{Delimiter}' cannot be the same.");
+		}
+
+		if (quote == NewLine && IsNewLineSet)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 240);
+			throw new ConfigurationException($"The quote character '{Quote}' and new line '{NewLine}' cannot be the same.");
+		}
+
+		if (lineEndings.Contains(quote))
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 246);
+			throw new ConfigurationException($"The quote character '{Quote}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
+		}
+
+		if (whiteSpaceChars.Contains(quote))
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 252);
+			throw new ConfigurationException($"The quote character '{Quote}' cannot be a WhiteSpaceChar.");
+		}
 
 		// Delimiter
-		if (Delimiter == NewLine && IsNewLineSet) throw new ConfigurationException($"The delimiter '{Delimiter}' and new line '{NewLine}' cannot be the same.");
-		if (lineEndings.Contains(Delimiter)) throw new ConfigurationException($"The delimiter '{Delimiter}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
-		if (whiteSpaceChars.Contains(Delimiter)) throw new ConfigurationException($"The delimiter '{Delimiter}' cannot be a WhiteSpaceChar.");
+		if (Delimiter == NewLine && IsNewLineSet)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 259);
+			throw new ConfigurationException($"The delimiter '{Delimiter}' and new line '{NewLine}' cannot be the same.");
+		}
+
+		if (lineEndings.Contains(Delimiter))
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 265);
+			throw new ConfigurationException($"The delimiter '{Delimiter}' cannot be a line ending. ('\\r', '\\n', '\\r\\n')");
+		}
+
+		if (whiteSpaceChars.Contains(Delimiter))
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 271);
+			throw new ConfigurationException($"The delimiter '{Delimiter}' cannot be a WhiteSpaceChar.");
+		}
 
 		// Detect Delimiter
-		if (DetectDelimiter && DetectDelimiterValues.Length == 0) throw new ConfigurationException($"At least one value is required for {nameof(DetectDelimiterValues)} when {nameof(DetectDelimiter)} is enabled.");
+		if (DetectDelimiter && DetectDelimiterValues.Length == 0)
+		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 278);
+			throw new ConfigurationException($"At least one value is required for {nameof(DetectDelimiterValues)} when {nameof(DetectDelimiter)} is enabled.");
+		}
+		FuzzingLogsCollector.Log("CsvConfiguration", "Validate", 281);
 	}
 
 	/// <summary>
@@ -225,6 +287,7 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// <typeparam name="T">Type with attributes.</typeparam>
 	public CsvConfiguration ApplyAttributes<T>()
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes<T>", 290);
 		return ApplyAttributes(typeof(T));
 	}
 
@@ -234,12 +297,15 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// <param name="type">Type with attributes.</param>
 	public CsvConfiguration ApplyAttributes(Type type)
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 300);
 		var attributes = type.GetCustomAttributes().OfType<IClassMapper>();
 		foreach (var attribute in attributes)
 		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 304);
 			attribute.ApplyTo(this);
 		}
 
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 308);
 		return this;
 	}
 
@@ -297,15 +363,19 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// <exception cref="CultureNotFoundException">If the argument to the <see cref="CultureInfoAttribute"/> does not specify a supported culture.</exception>
 	public static CsvConfiguration FromAttributes(Type type)
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 366);
 		var cultureInfoAttribute = (CultureInfoAttribute?)Attribute.GetCustomAttribute(type, typeof(CultureInfoAttribute));
 		if (cultureInfoAttribute == null)
 		{
+			FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 370);
 			throw new ConfigurationException($"A {nameof(CultureInfoAttribute)} is required on type '{type.Name}' to use this method.");
 		}
 
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 374);
 		var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 		config.ApplyAttributes(type);
 
+		FuzzingLogsCollector.Log("CsvConfiguration", "ApplyAttributes", 378);
 		return config;
 	}
 
@@ -320,11 +390,13 @@ public record CsvConfiguration : IReaderConfiguration, IWriterConfiguration
 	/// <remarks><inheritdoc cref="FromAttributes{T}()"/></remarks>
 	public static CsvConfiguration FromAttributes(Type type, CultureInfo cultureInfo)
 	{
+		FuzzingLogsCollector.Log("CsvConfiguration", "FromAttributes", 393);
 		var config = new CsvConfiguration(cultureInfo);
 		config.ApplyAttributes(type);
 		// Override the attribute.
 		config.CultureInfo = cultureInfo;
 
+		FuzzingLogsCollector.Log("CsvConfiguration", "FromAttributes", 399);
 		return config;
 	}
 }

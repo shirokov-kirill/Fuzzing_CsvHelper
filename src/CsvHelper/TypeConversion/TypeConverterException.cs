@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -41,6 +42,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="context">The reading context.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, string? text, CsvContext context) : base(context)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 45);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Text = text;
@@ -55,6 +57,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="context">The writing context.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, object? value, CsvContext context) : base(context)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 60);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Value = value;
@@ -71,6 +74,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="message">The message that describes the error.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, string? text, CsvContext context, string message) : base(context, message)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 77);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Text = text;
@@ -87,6 +91,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="message">The message that describes the error.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, object? value, CsvContext context, string message) : base(context, message)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 94);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Value = value;
@@ -94,7 +99,7 @@ public class TypeConverterException : CsvHelperException
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TypeConverterException"/> class
-	/// with a specified error message and a reference to the inner exception that 
+	/// with a specified error message and a reference to the inner exception that
 	/// is the cause of this exception.
 	/// </summary>
 	/// <param name="typeConverter">The type converter.</param>
@@ -105,6 +110,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, string? text, CsvContext context, string message, Exception innerException) : base(context, message, innerException)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 113);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Text = text;
@@ -112,7 +118,7 @@ public class TypeConverterException : CsvHelperException
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TypeConverterException"/> class
-	/// with a specified error message and a reference to the inner exception that 
+	/// with a specified error message and a reference to the inner exception that
 	/// is the cause of this exception.
 	/// </summary>
 	/// <param name="typeConverter">The type converter.</param>
@@ -123,6 +129,7 @@ public class TypeConverterException : CsvHelperException
 	/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 	public TypeConverterException(ITypeConverter typeConverter, MemberMapData memberMapData, object? value, CsvContext context, string message, Exception innerException) : base(context, message, innerException)
 	{
+		FuzzingLogsCollector.Log("TypeConverterException", "TypeConverterException", 132);
 		TypeConverter = typeConverter;
 		MemberMapData = memberMapData;
 		Value = value;

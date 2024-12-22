@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -75,8 +76,10 @@ public class TypeConverterOptions
 	/// <returns>The updated source object.</returns>
 	public static TypeConverterOptions Merge(params TypeConverterOptions[] sources)
 	{
+		FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 79);
 		if (sources.Length == 0)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 82);
 			throw new InvalidOperationException("At least one source must be provided.");
 		}
 
@@ -84,45 +87,54 @@ public class TypeConverterOptions
 
 		for (var i = 1; i < sources.Length; i++)
 		{
+			FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 90);
 			var source = sources[i];
 
 			if (source == null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 95);
 				continue;
 			}
 
 			if (source.CultureInfo != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 101);
 				options.CultureInfo = source.CultureInfo;
 			}
 
 			if (source.DateTimeStyle != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 107);
 				options.DateTimeStyle = source.DateTimeStyle;
 			}
 
 			if (source.TimeSpanStyle != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 113);
 				options.TimeSpanStyle = source.TimeSpanStyle;
 			}
 
 			if (source.NumberStyles != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 119);
 				options.NumberStyles = source.NumberStyles;
 			}
 
 			if (source.Formats != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 125);
 				options.Formats = source.Formats;
 			}
 
 			if (source.UriKind != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 131);
 				options.UriKind = source.UriKind;
 			}
 
 			if (source.EnumIgnoreCase != null)
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 137);
 				options.EnumIgnoreCase = source.EnumIgnoreCase;
 			}
 
@@ -131,23 +143,28 @@ public class TypeConverterOptions
 
 			if (!defaultBooleanTrueValues.SequenceEqual(source.BooleanTrueValues))
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 146);
 				options.BooleanTrueValues.Clear();
 				options.BooleanTrueValues.AddRange(source.BooleanTrueValues);
 			}
 
 			if (!defaultBooleanFalseValues.SequenceEqual(source.BooleanFalseValues))
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 153);
 				options.BooleanFalseValues.Clear();
 				options.BooleanFalseValues.AddRange(source.BooleanFalseValues);
 			}
 
 			if (!defaultNullValues.SequenceEqual(source.NullValues))
 			{
+				FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 160);
 				options.NullValues.Clear();
 				options.NullValues.AddRange(source.NullValues);
 			}
+			FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 164);
 		}
 
+		FuzzingLogsCollector.Log("TypeConverterOptions", "Merge", 167);
 		return options;
 	}
 }

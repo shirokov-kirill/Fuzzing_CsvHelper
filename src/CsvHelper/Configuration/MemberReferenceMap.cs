@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using System.Diagnostics;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -27,11 +28,14 @@ public class MemberReferenceMap
 	/// <param name="mapping">The <see cref="ClassMap"/> to use for the reference map.</param>
 	public MemberReferenceMap(MemberInfo member, ClassMap mapping)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMap", "MemberReferenceMap", 31);
 		if (mapping == null)
 		{
+			FuzzingLogsCollector.Log("MemberReferenceMap", "MemberReferenceMap", 34);
 			throw new ArgumentNullException(nameof(mapping));
 		}
 
+		FuzzingLogsCollector.Log("MemberReferenceMap", "MemberReferenceMap", 38);
 		data = new MemberReferenceMapData(member, mapping);
 	}
 
@@ -43,14 +47,17 @@ public class MemberReferenceMap
 	/// <returns>The current <see cref="MemberReferenceMap" /></returns>
 	public MemberReferenceMap Prefix(string? prefix = null, bool inherit = false)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMap", "Prefix", 50);
 		if (string.IsNullOrEmpty(prefix))
 		{
+			FuzzingLogsCollector.Log("MemberReferenceMap", "Prefix", 53);
 			prefix = data.Member.Name + ".";
 		}
 
 		data.Inherit = inherit;
 		data.Prefix = prefix!;
 
+		FuzzingLogsCollector.Log("MemberReferenceMap", "Prefix", 60);
 		return this;
 	}
 
@@ -61,6 +68,7 @@ public class MemberReferenceMap
 	/// <returns>The max index.</returns>
 	internal int GetMaxIndex()
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMap", "GetMaxIndex", 71);
 		return data.Mapping.GetMaxIndex();
 	}
 }

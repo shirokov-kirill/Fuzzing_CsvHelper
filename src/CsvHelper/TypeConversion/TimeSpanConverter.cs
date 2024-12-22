@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Globalization;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.TypeConversion;
 
@@ -21,19 +22,23 @@ public class TimeSpanConverter : DefaultTypeConverter
 	/// <returns>The object created from the string.</returns>
 	public override object? ConvertFromString(string? text, IReaderRow row, MemberMapData memberMapData)
 	{
+		FuzzingLogsCollector.Log("TimeSpanConverter", "ConvertFromString", 25);
 		var formatProvider = (IFormatProvider?)memberMapData.TypeConverterOptions.CultureInfo ?? memberMapData.TypeConverterOptions.CultureInfo;
 
 		var timeSpanStyle = memberMapData.TypeConverterOptions.TimeSpanStyle ?? TimeSpanStyles.None;
 		if (memberMapData.TypeConverterOptions.Formats != null && TimeSpan.TryParseExact(text, memberMapData.TypeConverterOptions.Formats, formatProvider, timeSpanStyle, out var span))
 		{
+			FuzzingLogsCollector.Log("TimeSpanConverter", "ConvertFromString", 31);
 			return span;
 		}
 
 		if (memberMapData.TypeConverterOptions.Formats == null && TimeSpan.TryParse(text, formatProvider, out span))
 		{
+			FuzzingLogsCollector.Log("TimeSpanConverter", "ConvertFromString", 37);
 			return span;
 		}
 
+		FuzzingLogsCollector.Log("TimeSpanConverter", "ConvertFromString", 41);
 		return base.ConvertFromString(text, row, memberMapData);
 	}
 }

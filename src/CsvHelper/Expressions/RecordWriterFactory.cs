@@ -3,6 +3,7 @@
 // See LICENSE.txt for details or visit http://www.opensource.org/licenses/ms-pl.html for MS-PL and http://opensource.org/licenses/Apache-2.0 for Apache 2.0.
 // https://github.com/JoshClose/CsvHelper
 using System.Dynamic;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -22,6 +23,7 @@ public class RecordWriterFactory
 	/// <param name="writer">The writer.</param>
 	public RecordWriterFactory(CsvWriter writer)
 	{
+		FuzzingLogsCollector.Log("RecordWriterFactory", "RecordWriterFactory", 26);
 		expandoObjectRecordWriter = new ExpandoObjectRecordWriter(writer);
 		dynamicRecordWriter = new DynamicRecordWriter(writer);
 		primitiveRecordWriter = new PrimitiveRecordWriter(writer);
@@ -34,21 +36,26 @@ public class RecordWriterFactory
 	/// <param name="recordType">The type of the record.</param>
 	public virtual RecordWriter MakeRecordWriter(Type recordType)
 	{
+		FuzzingLogsCollector.Log("RecordWriterFactory", "MakeRecordWriter", 39);
 		if (recordType.IsPrimitive)
 		{
+			FuzzingLogsCollector.Log("RecordWriterFactory", "MakeRecordWriter", 42);
 			return primitiveRecordWriter;
 		}
 
 		if (typeof(IDictionary<string, object>).IsAssignableFrom(recordType))
 		{
+			FuzzingLogsCollector.Log("RecordWriterFactory", "MakeRecordWriter", 48);
 			return expandoObjectRecordWriter;
 		}
 
 		if (typeof(IDynamicMetaObjectProvider).IsAssignableFrom(recordType))
 		{
+			FuzzingLogsCollector.Log("RecordWriterFactory", "MakeRecordWriter", 54);
 			return dynamicRecordWriter;
 		}
 
+		FuzzingLogsCollector.Log("RecordWriterFactory", "MakeRecordWriter", 58);
 		return objectRecordWriter;
 	}
 }

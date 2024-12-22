@@ -6,6 +6,7 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Expressions;
 
@@ -28,11 +29,14 @@ public class ObjectRecordWriter : RecordWriter
 	/// <param name="type">The type for the record.</param>
 	protected override Action<T> CreateWriteDelegate<T>(Type type)
 	{
+		FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 32);
 		if (Writer.Context.Maps[type] == null)
 		{
+			FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 35);
 			Writer.Context.Maps.Add(Writer.Context.AutoMap(type));
 		}
 
+		FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 39);
 		var recordParameter = Expression.Parameter(typeof(T), "record");
 		var recordParameterConverted = Expression.Convert(recordParameter, type);
 
@@ -43,15 +47,19 @@ public class ObjectRecordWriter : RecordWriter
 
 		if (members.Count == 0)
 		{
+			FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 50);
 			throw new WriterException(Writer.Context, $"No properties are mapped for type '{type.FullName}'.");
 		}
 
+		FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 54);
 		var delegates = new List<Action<T>>();
 
 		foreach (var memberMap in members)
 		{
+			FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 59);
 			if (memberMap.Data.WritingConvertExpression != null)
 			{
+				FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 62);
 				// The user is providing the expression to do the conversion.
 				Type convertGenericType = memberMap.Data.WritingConvertExpression.Type.GenericTypeArguments[0];
 
@@ -65,19 +73,24 @@ public class ObjectRecordWriter : RecordWriter
 
 			if (!Writer.CanWrite(memberMap))
 			{
+				FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 76);
 				continue;
 			}
 
+			FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 80);
 			Expression fieldExpression;
 
 			if (memberMap.Data.IsConstantSet)
 			{
+				FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 85);
 				if (memberMap.Data.Constant == null)
 				{
+					FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 88);
 					fieldExpression = Expression.Constant(string.Empty);
 				}
 				else
 				{
+					FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 93);
 					fieldExpression = Expression.Constant(memberMap.Data.Constant);
 					var typeConverterExpression = Expression.Constant(Writer.Context.TypeConverterCache.GetConverter(memberMap.Data.Constant.GetType()));
 					var method = typeof(ITypeConverter).GetMethod(nameof(ITypeConverter.ConvertToString))!;
@@ -87,11 +100,14 @@ public class ObjectRecordWriter : RecordWriter
 			}
 			else
 			{
+				FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 103);
 				if (memberMap.Data.TypeConverter == null)
 				{
+					FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 106);
 					// Skip if the type isn't convertible.
 					continue;
 				}
+				FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 110);
 
 				fieldExpression = ExpressionManager.CreateGetMemberExpression(recordParameterConverted, Writer.Context.Maps[type]!, memberMap)!;
 
@@ -104,6 +120,7 @@ public class ObjectRecordWriter : RecordWriter
 
 				if (type.GetTypeInfo().IsClass)
 				{
+					FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 123);
 					var areEqualExpression = Expression.Equal(recordParameterConverted, Expression.Constant(null));
 					fieldExpression = Expression.Condition(areEqualExpression, Expression.Constant(string.Empty), fieldExpression);
 				}
@@ -111,11 +128,13 @@ public class ObjectRecordWriter : RecordWriter
 
 			var writeFieldMethodCall = Expression.Call(Expression.Constant(Writer), nameof(Writer.WriteConvertedField), null, fieldExpression, Expression.Constant(memberMap.Data.Type));
 
+			FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 131);
 			delegates.Add(Expression.Lambda<Action<T>>(writeFieldMethodCall, recordParameter).Compile());
 		}
 
 		var action = CombineDelegates(delegates) ?? new Action<T>((T parameter) => { });
 
+		FuzzingLogsCollector.Log("ObjectRecordWriter", "CreateWriteDelegate", 137);
 		return action;
 	}
 }

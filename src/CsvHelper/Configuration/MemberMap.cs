@@ -7,6 +7,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -33,9 +34,11 @@ public abstract class MemberMap
 	/// <param name="member">The member being mapped.</param>
 	public static MemberMap CreateGeneric(Type classType, MemberInfo member)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "CreateGeneric", 37);
 		var memberMapType = typeof(MemberMap<,>).MakeGenericType(classType, member.MemberType());
 		var memberMap = (MemberMap)ObjectResolver.Current.Resolve(memberMapType, member);
 
+		FuzzingLogsCollector.Log("MemberMap", "CreateGeneric", 41);
 		return memberMap;
 	}
 
@@ -44,15 +47,17 @@ public abstract class MemberMap
 	/// at the index of the name if there was a
 	/// header specified. It will look for the
 	/// first name match in the order listed.
-	/// When writing, sets the name of the 
+	/// When writing, sets the name of the
 	/// field in the header record.
 	/// The first name will be used.
 	/// </summary>
 	/// <param name="names">The possible names of the CSV field.</param>
 	public virtual MemberMap Name(params string[] names)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Name", 57);
 		if (names == null || names.Length == 0)
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Name", 60);
 			throw new ArgumentNullException(nameof(names));
 		}
 
@@ -60,17 +65,19 @@ public abstract class MemberMap
 		Data.Names.AddRange(names);
 		Data.IsNameSet = true;
 
+		FuzzingLogsCollector.Log("MemberMap", "Name", 68);
 		return this;
 	}
 
 	/// <summary>
-	/// When reading, is used to get the 
-	/// index of the name used when there 
+	/// When reading, is used to get the
+	/// index of the name used when there
 	/// are multiple names that are the same.
 	/// </summary>
 	/// <param name="index">The index of the name.</param>
 	public virtual MemberMap NameIndex(int index)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "NameIndex", 68);
 		Data.NameIndex = index;
 
 		return this;
@@ -86,6 +93,7 @@ public abstract class MemberMap
 	/// <param name="indexEnd">The end index used when mapping to an <see cref="IEnumerable"/> member.</param>
 	public virtual MemberMap Index(int index, int indexEnd = -1)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Index", 96);
 		Data.Index = index;
 		Data.IsIndexSet = true;
 		Data.IndexEnd = indexEnd;
@@ -102,6 +110,7 @@ public abstract class MemberMap
 	/// </summary>
 	public virtual MemberMap Ignore()
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Ignore", 113);
 		Data.Ignore = true;
 
 		return this;
@@ -117,6 +126,7 @@ public abstract class MemberMap
 	/// <param name="ignore">True to ignore, otherwise false.</param>
 	public virtual MemberMap Ignore(bool ignore)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Ignore", 129);
 		Data.Ignore = ignore;
 
 		return this;
@@ -130,18 +140,22 @@ public abstract class MemberMap
 	/// <param name="useOnConversionFailure">Use default on conversion failure.</param>
 	public virtual MemberMap Default(object defaultValue, bool useOnConversionFailure = false)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Default", 143);
 		if (Data.Member == null)
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Default", 146);
 			throw new InvalidOperationException($"{nameof(Data.Member)} cannot be null.");
 		}
 
 		if (defaultValue == null && Data.Member.MemberType().IsValueType)
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Default", 152);
 			throw new ArgumentException($"Member of type '{Data.Member.MemberType().FullName}' can't have a default value of null.");
 		}
 
 		if (defaultValue != null && !Data.Member.MemberType().IsAssignableFrom(defaultValue.GetType()))
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Default", 158);
 			throw new ArgumentException($"Default of type '{defaultValue.GetType().FullName}' is not assignable to '{Data.Member.MemberType().FullName}'.");
 		}
 
@@ -149,35 +163,41 @@ public abstract class MemberMap
 		Data.IsDefaultSet = true;
 		Data.UseDefaultOnConversionFailure = useOnConversionFailure;
 
+		FuzzingLogsCollector.Log("MemberMap", "Default", 166);
 		return this;
 	}
 
 	/// <summary>
-	/// The constant value that will be used for every record when 
-	/// reading and writing. This value will always be used no matter 
+	/// The constant value that will be used for every record when
+	/// reading and writing. This value will always be used no matter
 	/// what other mapping configurations are specified.
 	/// </summary>
 	/// <param name="constantValue">The constant value.</param>
 	public virtual MemberMap Constant(object? constantValue)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Constant", 178);
 		if (Data.Member == null)
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Constant", 181);
 			throw new InvalidOperationException($"{nameof(Data.Member)} cannot be null.");
 		}
 
 		if (constantValue == null && Data.Member.MemberType().IsValueType)
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Constant", 187);
 			throw new ArgumentException($"Member of type '{Data.Member.MemberType().FullName}' can't have a constant value of null.");
 		}
 
 		if (constantValue != null && !Data.Member.MemberType().IsAssignableFrom(constantValue.GetType()))
 		{
+			FuzzingLogsCollector.Log("MemberMap", "Constant", 193);
 			throw new ArgumentException($"Constant of type '{constantValue.GetType().FullName}' is not assignable to '{Data.Member.MemberType().FullName}'.");
 		}
 
 		Data.Constant = constantValue;
 		Data.IsConstantSet = true;
 
+		FuzzingLogsCollector.Log("MemberMap", "Constant", 200);
 		return this;
 	}
 
@@ -188,6 +208,7 @@ public abstract class MemberMap
 	/// <param name="typeConverter">The TypeConverter to use.</param>
 	public virtual MemberMap TypeConverter(ITypeConverter typeConverter)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "TypeConverter", 211);
 		Data.TypeConverter = typeConverter;
 
 		return this;
@@ -197,10 +218,11 @@ public abstract class MemberMap
 	/// Specifies the <see cref="TypeConverter"/> to use
 	/// when converting the member to and from a CSV field.
 	/// </summary>
-	/// <typeparam name="TConverter">The <see cref="System.Type"/> of the 
+	/// <typeparam name="TConverter">The <see cref="System.Type"/> of the
 	/// <see cref="TypeConverter"/> to use.</typeparam>
 	public virtual MemberMap TypeConverter<TConverter>() where TConverter : ITypeConverter
 	{
+		FuzzingLogsCollector.Log("MemberMap", "TypeConverter<TConverter>", 225);
 		TypeConverter(ObjectResolver.Current.Resolve<TConverter>());
 
 		return this;
@@ -211,6 +233,7 @@ public abstract class MemberMap
 	/// </summary>
 	public virtual MemberMap Optional()
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Optional", 236);
 		Data.IsOptional = true;
 
 		return this;
@@ -222,6 +245,7 @@ public abstract class MemberMap
 	/// <param name="validateExpression"></param>
 	public virtual MemberMap Validate(Validate validateExpression)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Validate", 248);
 		return Validate(validateExpression, args => $"Field '{args.Field}' is not valid.");
 	}
 
@@ -232,6 +256,7 @@ public abstract class MemberMap
 	/// <param name="validateMessageExpression"></param>
 	public virtual MemberMap Validate(Validate validateExpression, ValidateMessage validateMessageExpression)
 	{
+		FuzzingLogsCollector.Log("MemberMap", "Validate", 259);
 		var fieldParameter = Expression.Parameter(typeof(ValidateArgs), "field");
 		var validateCallExpression = Expression.Call(
 			Expression.Constant(validateExpression.Target),
@@ -247,6 +272,7 @@ public abstract class MemberMap
 		Data.ValidateExpression = Expression.Lambda<Validate>(validateCallExpression, fieldParameter);
 		Data.ValidateMessageExpression = Expression.Lambda<ValidateMessage>(messageCallExpression, fieldParameter);
 
+		FuzzingLogsCollector.Log("MemberMap", "Validate", 275);
 		return this;
 	}
 }

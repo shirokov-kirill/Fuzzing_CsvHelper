@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -45,6 +46,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <param name="comparer">The comparer to use when sorting the member maps.</param>
 	public MemberMapCollection(IComparer<MemberMap> comparer)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "MemberMapCollection", 49);
 		this.comparer = comparer;
 	}
 
@@ -57,6 +59,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <filterpriority>1</filterpriority>
 	public virtual IEnumerator<MemberMap> GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "GetEnumerator", 62);
 		return list.GetEnumerator();
 	}
 
@@ -69,6 +72,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <filterpriority>2</filterpriority>
 	IEnumerator IEnumerable.GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "GetEnumerator", 75);
 		return GetEnumerator();
 	}
 
@@ -80,6 +84,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </exception>
 	public virtual void Add(MemberMap item)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Add", 87);
 		list.Add(item);
 		list.Sort(comparer);
 	}
@@ -90,6 +95,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <param name="collection">The collection to add.</param>
 	public virtual void AddRange(ICollection<MemberMap> collection)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "AddRange", 98);
 		list.AddRange(collection);
 		list.Sort(comparer);
 	}
@@ -97,10 +103,11 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <summary>
 	/// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
 	/// </summary>
-	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only. 
+	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
 	///                 </exception>
 	public virtual void Clear()
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Clear", 110);
 		list.Clear();
 	}
 
@@ -114,6 +121,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </param>
 	public virtual bool Contains(MemberMap item)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Contains", 124);
 		return list.Contains(item);
 	}
 
@@ -123,6 +131,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param><param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception><exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.</exception>
 	public virtual void CopyTo(MemberMap[] array, int arrayIndex)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "CopyTo", 134);
 		list.CopyTo(array, arrayIndex);
 	}
 
@@ -137,6 +146,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </exception>
 	public virtual bool Remove(MemberMap item)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Remove", 149);
 		return list.Remove(item);
 	}
 
@@ -150,6 +160,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </param>
 	public virtual int IndexOf(MemberMap item)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "IndexOf", 163);
 		return list.IndexOf(item);
 	}
 
@@ -163,6 +174,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </exception>
 	public virtual void Insert(int index, MemberMap item)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Insert", 177);
 		list.Insert(index, item);
 	}
 
@@ -175,6 +187,7 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </exception>
 	public virtual void RemoveAt(int index)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "RemoveAt", 190);
 		list.RemoveAt(index);
 	}
 
@@ -190,8 +203,16 @@ public class MemberMapCollection : IList<MemberMap>
 	///                 </exception>
 	public virtual MemberMap this[int index]
 	{
-		get { return list[index]; }
-		set { list[index] = value; }
+		get
+		{
+			FuzzingLogsCollector.Log("MemberMapCollection", "get", 208);
+			return list[index];
+		}
+		set
+		{
+			FuzzingLogsCollector.Log("MemberMapCollection", "set", 213);
+			list[index] = value;
+		}
 	}
 
 	/// <summary>
@@ -202,6 +223,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <returns>The <see cref="MemberMap"/> for the given expression, or null if not found.</returns>
 	public virtual MemberMap? Find<T>(Expression<Func<T, object?>> expression)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Find<T>", 226);
 		var member = ReflectionHelper.GetMember(expression);
 		return Find(member);
 	}
@@ -213,6 +235,7 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <returns>The <see cref="MemberMap"/> for the given expression, or null if not found.</returns>
 	public virtual MemberMap? Find(MemberInfo member)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "Find", 238);
 		var existingMap = list.SingleOrDefault(m =>
 		   m.Data.Member == member ||
 		   m.Data.Member != null &&
@@ -223,6 +246,7 @@ public class MemberMapCollection : IList<MemberMap>
 		   )
 		);
 
+		FuzzingLogsCollector.Log("MemberMapCollection", "Find", 249);
 		return existingMap;
 	}
 
@@ -234,9 +258,11 @@ public class MemberMapCollection : IList<MemberMap>
 	/// <param name="mapping">The mapping where the members are added from.</param>
 	public virtual void AddMembers(ClassMap mapping)
 	{
+		FuzzingLogsCollector.Log("MemberMapCollection", "AddMembers", 261);
 		AddRange(mapping.MemberMaps);
 		foreach (var refmap in mapping.ReferenceMaps)
 		{
+			FuzzingLogsCollector.Log("MemberMapCollection", "AddMembers", 265);
 			AddMembers(refmap.Data.Mapping);
 		}
 	}

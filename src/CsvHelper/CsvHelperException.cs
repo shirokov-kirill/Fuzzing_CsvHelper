@@ -4,6 +4,7 @@
 // https://github.com/JoshClose/CsvHelper
 using CsvHelper.Configuration;
 using System.Text;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper;
 
@@ -44,6 +45,7 @@ public class CsvHelperException : Exception
 	/// </summary>
 	public CsvHelperException(CsvContext context)
 	{
+		FuzzingLogsCollector.Log("CsvHelperException", "CsvHelperException", 48);
 		this.context = context;
 	}
 
@@ -55,12 +57,13 @@ public class CsvHelperException : Exception
 	/// <param name="message">The message that describes the error.</param>
 	public CsvHelperException(CsvContext context, string message) : base(AddDetails(message, context))
 	{
+		FuzzingLogsCollector.Log("CsvHelperException", "CsvHelperException", 60);
 		this.context = context;
 	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="CsvHelperException"/> class
-	/// with a specified error message and a reference to the inner exception that 
+	/// with a specified error message and a reference to the inner exception that
 	/// is the cause of this exception.
 	/// </summary>
 	/// <param name="context">The context.</param>
@@ -68,37 +71,43 @@ public class CsvHelperException : Exception
 	/// <param name="innerException">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
 	public CsvHelperException(CsvContext context, string message, Exception innerException) : base(AddDetails(message, context), innerException)
 	{
+		FuzzingLogsCollector.Log("CsvHelperException", "CsvHelperException", 74);
 		this.context = context;
 	}
 
 	private static string AddDetails(string message, CsvContext context)
 	{
+		FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 80);
 		var indent = new string(' ', 3);
 
 		var details = new StringBuilder();
 
 		if (context.Reader != null)
 		{
+			FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 87);
 			details.AppendLine($"{nameof(IReader)} state:");
 			details.AppendLine($"{indent}{nameof(IReader.ColumnCount)}: {context.Reader.ColumnCount}");
 			details.AppendLine($"{indent}{nameof(IReader.CurrentIndex)}: {context.Reader.CurrentIndex}");
 			try
 			{
+				FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 93);
 				var record = new StringBuilder();
 				if (context.Reader.HeaderRecord != null)
 				{
+					FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 97);
 					record.Append("[\"");
 					record.Append(string.Join("\",\"", context.Reader.HeaderRecord));
 					record.Append("\"]");
 				}
-
+				FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 102);
 				details.AppendLine($"{indent}{nameof(IReader.HeaderRecord)}:{Environment.NewLine}{record}");
 			}
-			catch { }
+			catch { FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 105); }
 		}
 
 		if (context.Parser != null)
 		{
+			FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 110);
 			details.AppendLine($"{nameof(IParser)} state:");
 			details.AppendLine($"{indent}{nameof(IParser.ByteCount)}: {context.Parser.ByteCount}");
 			details.AppendLine($"{indent}{nameof(IParser.CharCount)}: {context.Parser.CharCount}");
@@ -108,16 +117,21 @@ public class CsvHelperException : Exception
 
 			try
 			{
+				FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 120);
 				var rawRecord = context.Configuration.ExceptionMessagesContainRawData
 					? context.Parser.RawRecord
 					: $"Hidden because {nameof(IParserConfiguration.ExceptionMessagesContainRawData)} is false.";
 				details.AppendLine($"{indent}{nameof(IParser.RawRecord)}:{Environment.NewLine}{rawRecord}");
 			}
-			catch { }
+			catch
+			{
+				FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 128);
+			}
 		}
 
 		if (context.Writer != null)
 		{
+			FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 134);
 			details.AppendLine($"{nameof(IWriter)} state:");
 			details.AppendLine($"{indent}{nameof(IWriter.Row)}: {context.Writer.Row}");
 			details.AppendLine($"{indent}{nameof(IWriter.Index)}: {context.Writer.Index}");
@@ -125,9 +139,11 @@ public class CsvHelperException : Exception
 			var record = new StringBuilder();
 			if (context.Writer.HeaderRecord != null)
 			{
+				FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 142);
 				record.Append("[");
 				if (context.Writer.HeaderRecord.Length > 0)
 				{
+					FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 146);
 					record.Append("\"");
 					record.Append(string.Join("\",\"", context.Writer.HeaderRecord));
 					record.Append("\"");
@@ -136,6 +152,8 @@ public class CsvHelperException : Exception
 			}
 			details.AppendLine($"{indent}{nameof(IWriter.HeaderRecord)}:{Environment.NewLine}{context.Writer.Row}");
 		}
+
+		FuzzingLogsCollector.Log("CsvHelperException", "AddDetails", 156);
 
 		return $"{message}{Environment.NewLine}{details}";
 	}

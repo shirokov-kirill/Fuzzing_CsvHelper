@@ -5,6 +5,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper;
 
@@ -21,18 +22,22 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static Type MemberType(this MemberInfo member)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "MemberType", 25);
 		var property = member as PropertyInfo;
 		if (property != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionExtensions", "MemberType", 29);
 			return property.PropertyType;
 		}
 
 		var field = member as FieldInfo;
 		if (field != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionExtensions", "MemberType", 36);
 			return field.FieldType;
 		}
 
+		FuzzingLogsCollector.Log("ReflectionExtensions", "MemberType", 40);
 		throw new InvalidOperationException("Member is not a property or a field.");
 	}
 
@@ -45,18 +50,22 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static MemberExpression GetMemberExpression(this MemberInfo member, Expression expression)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "GetMemberExpression", 53);
 		var property = member as PropertyInfo;
 		if (property != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionExtensions", "GetMemberExpression", 57);
 			return Expression.Property(expression, property);
 		}
 
 		var field = member as FieldInfo;
 		if (field != null)
 		{
+			FuzzingLogsCollector.Log("ReflectionExtensions", "GetMemberExpression", 64);
 			return Expression.Field(expression, field);
 		}
 
+		FuzzingLogsCollector.Log("ReflectionExtensions", "GetMemberExpression", 68);
 		throw new InvalidOperationException("Member is not a property or a field.");
 	}
 
@@ -68,11 +77,14 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsAnonymous(this Type type)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "IsAnonymous", 80);
 		if (type == null)
 		{
+			FuzzingLogsCollector.Log("ReflectionExtensions", "IsAnonymous", 83);
 			throw new ArgumentNullException(nameof(type));
 		}
 
+		FuzzingLogsCollector.Log("ReflectionExtensions", "IsAnonymous", 87);
 		// https://stackoverflow.com/a/2483054/68499
 		var isAnonymous = Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
 			&& type.IsGenericType
@@ -91,6 +103,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool HasParameterlessConstructor(this Type type)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "HasParameterlessConstructor", 106);
 		return type.GetConstructor(new Type[0]) != null;
 	}
 
@@ -101,6 +114,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool HasConstructor(this Type type)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "HasConstructor", 117);
 		return type.GetConstructors().Length > 0;
 	}
 
@@ -111,6 +125,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static ConstructorInfo GetConstructorWithMostParameters(this Type type)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "GetConstructorWithMostParameters", 128);
 		return type.GetConstructors()
 			.OrderByDescending(c => c.GetParameters().Length)
 			.First();
@@ -124,6 +139,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static bool IsUserDefinedStruct(this Type type)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "IsUserDefinedStruct", 142);
 		return type.IsValueType && !type.IsPrimitive && !type.IsEnum;
 	}
 
@@ -134,6 +150,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static string GetDefinition(this ConstructorInfo constructor)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "GetDefinition", 153);
 		var parameters = constructor.GetParameters();
 		var definition = $"{constructor.Name}({string.Join(", ", parameters.Select(p => p.GetDefinition()))})";
 
@@ -147,6 +164,7 @@ public static class ReflectionExtensions
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public static string GetDefinition(this ParameterInfo parameter)
 	{
+		FuzzingLogsCollector.Log("ReflectionExtensions", "GetDefinition", 167);
 		return $"{parameter.ParameterType.Name} {parameter.Name}";
 	}
 }

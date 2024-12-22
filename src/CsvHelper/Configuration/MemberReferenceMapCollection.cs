@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Configuration;
 
@@ -42,6 +43,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <filterpriority>1</filterpriority>
 	public virtual IEnumerator<MemberReferenceMap> GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "GetEnumerator", 46);
 		return list.GetEnumerator();
 	}
 
@@ -50,6 +52,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <filterpriority>2</filterpriority>
 	IEnumerator IEnumerable.GetEnumerator()
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "GetEnumerator", 55);
 		return GetEnumerator();
 	}
 
@@ -58,6 +61,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
 	public virtual void Add(MemberReferenceMap item)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Add", 64);
 		list.Add(item);
 	}
 
@@ -65,6 +69,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only. </exception>
 	public virtual void Clear()
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Clear", 72);
 		list.Clear();
 	}
 
@@ -73,6 +78,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
 	public virtual bool Contains(MemberReferenceMap item)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Contains", 81);
 		return list.Contains(item);
 	}
 
@@ -86,6 +92,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.ArgumentException">The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1" /> is greater than the available space from <paramref name="arrayIndex" /> to the end of the destination <paramref name="array" />.</exception>
 	public virtual void CopyTo(MemberReferenceMap[] array, int arrayIndex)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "CopyTo", 95);
 		list.CopyTo(array, arrayIndex);
 	}
 
@@ -95,6 +102,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1" /> is read-only.</exception>
 	public virtual bool Remove(MemberReferenceMap item)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Remove", 105);
 		return list.Remove(item);
 	}
 
@@ -103,6 +111,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.IList`1" />.</param>
 	public virtual int IndexOf(MemberReferenceMap item)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "IndexOf", 114);
 		return list.IndexOf(item);
 	}
 
@@ -114,6 +123,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1" /> is read-only.</exception>
 	public virtual void Insert(int index, MemberReferenceMap item)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Insert", 126);
 		list.Insert(index, item);
 	}
 
@@ -124,6 +134,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1" /> is read-only.</exception>
 	public virtual void RemoveAt(int index)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "RemoveAt", 137);
 		list.RemoveAt(index);
 	}
 
@@ -135,6 +146,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <returns>The <see cref="MemberReferenceMap"/> for the given expression, or null if not found.</returns>
 	public virtual MemberReferenceMap? Find<T>(Expression<Func<T, object>> expression)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Find<T>", 149);
 		var member = ReflectionHelper.GetMember(expression);
 		return Find(member);
 	}
@@ -146,6 +158,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 	/// <returns>The <see cref="MemberReferenceMap"/> for the given expression, or null if not found.</returns>
 	public virtual MemberReferenceMap? Find(MemberInfo member)
 	{
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Find", 161);
 		var existingMap = list.SingleOrDefault(m =>
 			m.Data.Member == member ||
 			m.Data.Member.Name == member.Name &&
@@ -155,6 +168,7 @@ public class MemberReferenceMapCollection : IList<MemberReferenceMap>
 			)
 		);
 
+		FuzzingLogsCollector.Log("MemberReferenceMapCollection", "Find", 171);
 		return existingMap;
 	}
 }
