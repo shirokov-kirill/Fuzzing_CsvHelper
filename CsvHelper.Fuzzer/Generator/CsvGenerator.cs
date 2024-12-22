@@ -5,18 +5,17 @@ using CsvHelper.Fuzzer.Generator.specification;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public class SpecificationBasedGenerator(Random random): InputGeneratorBase
+public class SpecificationBasedGenerator(MemoryStream stream, StreamWriter writer, Random random): InputGeneratorBase
 {
+	protected override MemoryStream Stream => stream;
 	private readonly CsvSpecificationOwner myCsvSpecificationOwner = new CsvSpecificationOwner(SpecificationType.RFC_4180);
 
 	public override IFuzzGeneratorContext Generate()
 	{
-		// create storage folder if none exists
-		var filePath = CreateEmptyFile();
-		var context = new CsvGeneratorContext(filePath, myCsvSpecificationOwner);
+		var context = new CsvGeneratorContext(writer, Stream, myCsvSpecificationOwner);
 
 		var recordsCount = random.Next(MaxLinesCount);
-		var fieldsCount = random.Next(1, 300);
+		var fieldsCount = random.Next(1, 30);
 
 		// Generate header
 		// Some sources on the internet state both with and without header csv are OK, while others state that header is a mandatory part.
@@ -41,13 +40,13 @@ public class SpecificationBasedGenerator(Random random): InputGeneratorBase
 
 	private string GenerateFieldName()
 	{
-		var length = random.Next(1, 30);
+		var length = random.Next(1, 20);
 		return GeneratorUtils.GetRandomString(random, length);
 	}
 
 	private string GenerateField()
 	{
-		var length = random.Next(1, 100);
+		var length = random.Next(0, 50);
 		return GeneratorUtils.GetRandomString(random, length);
 	}
 }

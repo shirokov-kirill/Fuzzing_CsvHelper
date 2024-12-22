@@ -2,8 +2,9 @@ using CsvHelper.Fuzzer.Generator.context;
 
 namespace CsvHelper.Fuzzer.Generator;
 
-public class InputGeneratorBase: IInputGenerator
+public abstract class InputGeneratorBase: IInputGenerator
 {
+	protected abstract MemoryStream Stream { get; }
 	protected int MaxLinesCount = 2000;
 
 	protected string CreateEmptyFile()
@@ -22,6 +23,6 @@ public class InputGeneratorBase: IInputGenerator
 	public virtual IFuzzGeneratorContext Generate()
 	{
 		var filePath = CreateEmptyFile();
-		return new RandomGeneratorContext(filePath);
+		return new RandomGeneratorContext(Stream);
 	}
 }

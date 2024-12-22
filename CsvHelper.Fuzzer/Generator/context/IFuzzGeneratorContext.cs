@@ -6,7 +6,7 @@ public interface IFuzzGeneratorContext
 	/// Writes all containing data to .csv file
 	/// </summary>
 	/// <returns>Path which contains .csv file with result</returns>
-	public string ToCsv();
+	public void ToCsv();
 
 	/// <summary>
 	/// Gets the result to expect

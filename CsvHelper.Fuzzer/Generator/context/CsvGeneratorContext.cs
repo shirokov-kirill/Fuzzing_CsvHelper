@@ -6,7 +6,10 @@ namespace CsvHelper.Fuzzer.Generator.context;
 /// Main class to perform mutations on generated data.<br />
 /// Use <inheritdoc cref="ToCsv"/> method to write all data into the .csv file and finalize production.
 /// </summary>
-public class CsvGeneratorContext(string path, CsvSpecificationOwner formatter): IFuzzGeneratorContext
+public class CsvGeneratorContext(
+	StreamWriter writer,
+	MemoryStream stream,
+	CsvSpecificationOwner formatter): IFuzzGeneratorContext
 {
 	private readonly CsvSpecificationOwner myFormatter = formatter;
 
@@ -16,18 +19,15 @@ public class CsvGeneratorContext(string path, CsvSpecificationOwner formatter): 
 
 	private List<string> MyLines => Compile();
 
-	public string ToCsv()
+	public void ToCsv()
 	{
 		if (!isCompiled)
 		{
-
-			using StreamWriter file = new StreamWriter(path);
 			foreach (var line in MyLines)
 			{
-				file.WriteLine(line);
+				writer.WriteLine(line);
 			}
 		}
-		return path;
 	}
 
 	public object GetExpectedResult()

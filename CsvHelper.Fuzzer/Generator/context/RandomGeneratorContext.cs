@@ -1,17 +1,16 @@
 namespace CsvHelper.Fuzzer.Generator.context;
 
-public class RandomGeneratorContext(string path): IFuzzGeneratorContext
+public class RandomGeneratorContext(MemoryStream stream): IFuzzGeneratorContext
 {
 	private readonly List<string> myLines = new List<string>();
 
-	public string ToCsv()
+	public void ToCsv()
 	{
-		using StreamWriter file = new StreamWriter(path);
+		using StreamWriter file = new StreamWriter(stream);
 		foreach (var line in myLines)
 		{
 			file.WriteLine(line);
 		}
-		return path;
 	}
 
 	public object GetExpectedResult()
