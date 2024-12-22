@@ -1,6 +1,8 @@
 using System.Text;
 using CsvHelper.Fuzzer.Generator;
 using CsvHelper.Fuzzer.Tests;
+using CsvHelper.Fuzzer.Tracing;
+using CsvHelper.FuzzingLogger;
 
 namespace CsvHelper.Fuzzer;
 
@@ -8,16 +10,17 @@ public class CsvFuzzer<T>(IInputGenerator generator, Func<string, object, Execut
 {
 	public void Fuzz()
 	{
-		var counter = 0;
-		var maxCount = 1000;
-		while (counter < maxCount)
+		var globalCounter = 0;
+		var traceCollector = new TraceCollector(FuzzingLogsCollector.Instance);
+		while (traceCollector.ShouldRepeat())
 		{
+			traceCollector.Next();
 			var context = generator.Generate();
 			var path = context.ToCsv();
 			var result = target(path, context.GetExpectedResult());
 			if (result == ExecutionResult<T>.Failed)
 			{
-				Console.WriteLine($"Run number {counter}");
+				Console.WriteLine($"Run number {globalCounter}");
 				if (result.Payload != null)
 				{
 					Console.WriteLine($"Failed, actual result: [");
@@ -39,7 +42,12 @@ public class CsvFuzzer<T>(IInputGenerator generator, Func<string, object, Execut
 				if (result.Exception != null)
 					Console.WriteLine($"Failed, exception {result.Exception}");
 			}
-			counter++;
+			traceCollector.Commit();
+			globalCounter++;
+			if (globalCounter % 100 == 0)
+			{
+				Console.WriteLine(traceCollector.GetStatistics());
+			}
 		}
 	}
 }

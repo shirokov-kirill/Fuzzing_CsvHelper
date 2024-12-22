@@ -27,4 +27,9 @@ public class FuzzingLogsCollector
 	{
 		return myTrace;
 	}
+
+	public void Reset()
+	{
+		myTrace = new HashSet<string>();
+	}
 }
